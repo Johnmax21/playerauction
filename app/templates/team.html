@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teams</title>
+
+    <!-- W3 CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        }
+
+        .form-card {
+            margin-top: 40px;
+            width: 50%;
+            border-radius: 20px;
+        }
+
+        .team-card {
+            border-radius: 15px;
+        }
+    </style>
+</head>
+
+<body class="w3-text-white">
+
+<div class="w3-container w3-center">
+
+    <h1 class="w3-xxxlarge w3-padding-16">
+        🏏 TEAM MANAGEMENT
+    </h1>
+
+    <!-- ➕ Add Team Form -->
+    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge form-card w3-margin-auto">
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <p>
+                <label>Team Name</label>
+                <input class="w3-input w3-round-large"
+                       type="text"
+                       name="name"
+                       required>
+            </p>
+
+            <p>
+                <label>Initial Purse (₹)</label>
+                <input class="w3-input w3-round-large"
+                       type="number"
+                       name="purse"
+                       required>
+            </p>
+
+            <p>
+                <label>Team Logo</label>
+                <input class="w3-input w3-round-large"
+                       type="file"
+                       name="logo"
+                       accept="image/*">
+            </p>
+
+            <button class="w3-button w3-green w3-round-large w3-margin-top">
+                ➕ ADD TEAM
+            </button>
+
+        </form>
+
+    </div>
+
+    <hr class="w3-opacity w3-margin-top">
+
+    <!-- 📋 Team List -->
+    <div class="w3-row-padding w3-margin-top">
+
+        {% for team in teams %}
+        <div class="w3-col l4 m6 s12 w3-margin-bottom">
+            <div class="w3-card w3-dark-grey w3-padding w3-center team-card">
+
+                {% if team.logo %}
+                    <img src="{{ team.logo.url }}"
+                         class="w3-circle"
+                         width="120">
+                {% endif %}
+
+                <h3>{{ team.name }}</h3>
+
+                <p>💰 Purse: ₹ {{ team.purse }}</p>
+
+                <p>
+                    🏏 Players:
+                    {{ team.player_set.count }}
+                </p>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

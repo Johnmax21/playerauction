@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Control</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <style>
+        body { background: linear-gradient(to right,#141E30,#243B55); }
+        .card { margin-top:60px; width:60%; border-radius:20px; }
+        .price { font-size:45px; font-weight:bold; color:#4CAF50; }
+        .team { font-size:22px; color:#FFC107; }
+    </style>
+</head>
+
+<body class="w3-text-white">
+<div class="w3-container w3-center">
+
+    <h1 class="w3-xxxlarge w3-padding-16">🎛 ADMIN CONTROL</h1>
+
+    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge card w3-margin-auto">
+
+        <!-- Search Player -->
+        <input class="w3-input w3-round-large w3-margin-bottom"
+               type="text"
+               id="searchInput"
+               placeholder="🔍 Search Player..."
+               onkeyup="filterPlayers()">
+
+        <!-- Select Player -->
+        <select class="w3-select w3-round-large w3-margin-bottom"
+                id="playerSelect"
+                onchange="setPlayer()">
+            <option disabled selected>Select Player</option>
+            {% for player in players %}
+                <option value="{{ player.id }}">
+                    {{ player.name }} - ₹{{ player.base_price }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <hr>
+
+        <!-- Current Player -->
+        <h2 id="playerName">
+            {% if auction.player %} {{ auction.player.name }}
+            {% else %} No Player Selected {% endif %}
+        </h2>
+
+        <div class="price" id="price">₹ {{ auction.current_price }}</div>
+
+        <div class="team" id="team">
+            Current Team:
+            {% if auction.current_team %}
+                {{ auction.current_team.name }}
+            {% else %}
+                None
+            {% endif %}
+        </div>
+
+        <!-- Select Team -->
+        <select id="teamSelect" class="w3-select w3-round-large">
+    <option value="" selected disabled>Select Team</option>
+    {% for team in teams %}
+        <option value="{{ team.id }}">{{ team.name }}</option>
+    {% endfor %}
+</select>
+
+        <br>
+
+        <!-- Bid Button -->
+        <button onclick="placeBid()"
+                class="w3-button w3-green w3-xlarge w3-round-large w3-margin-top">
+            + ₹50 BID
+        </button>
+
+        <!-- Sold -->
+ <button onclick="markSold({{ auction.id }})"
+        class="w3-button w3-red w3-round-large">
+    SOLD
+</button>
+
+        <!-- Unsold -->
+                 <button onclick="unsoldPlayer()"
+                class="w3-button w3-grey w3-xlarge w3-round-large w3-margin-top">
+            ❌ UNSOLD
+        </button>
+
+        
+
+    </div>
+</div>
+
+<script>
+   
+function markSold(playerId){
+    fetch("/mark-sold/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            player_id: playerId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+        } else {
+            alert("Sold to " + data.team + " for ₹" + data.price);
+            location.reload();
+        }
+    });
+}
+function unsoldPlayer(){
+    fetch("/unsold-player/")
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+        } else {
+            alert("Player marked as unsold");
+            location.reload();
+        }
+    });
+}
+function filterPlayers(){
+    let input=document.getElementById("searchInput").value.toLowerCase();
+    let options=document.getElementById("playerSelect").options;
+    for(let i=0;i<options.length;i++){
+        options[i].style.display=
+        options[i].text.toLowerCase().includes(input)?"":"none";
+    }
+}
+
+function setPlayer(){
+    let id=document.getElementById("playerSelect").value;
+    fetch("/set-player/",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:JSON.stringify({player_id:id})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("playerName").innerText=data.name;
+        document.getElementById("price").innerText="₹ "+data.price;
+        document.getElementById("team").innerText="Current Team: None";
+    });
+}
+function placeBid(){
+    let teamId = document.getElementById("teamSelect").value;
+
+    if (!teamId) {
+        alert("Please select a team first!");
+        return;
+    }
+
+    fetch("/place-bid/", {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:JSON.stringify({team_id: teamId})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById("price").innerText="₹ "+data.price;
+        document.getElementById("team").innerText="Current Team: "+data.team;
+    });
+}
+</script>
+
+</body>
+</html>

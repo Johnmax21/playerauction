@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Auction</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);}
+        .price{font-size:60px;font-weight:bold;color:#4CAF50;}
+        .team{font-size:30px;color:#FFC107;}
+        .status{font-size:30px;margin-top:10px;}
+    </style>
+</head>
+
+<body class="w3-text-white">
+<div class="w3-container w3-center">
+
+    <h1 class="w3-xxxlarge w3-padding-16">🏏 LIVE AUCTION</h1>
+
+    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge">
+
+        <h2 id="playerName">
+            {% if auction.player %} {{ auction.player.name }}
+            {% else %} Waiting... {% endif %}
+        </h2>
+
+        <div class="price" id="price">₹ {{ auction.current_price }}</div>
+
+        <div class="team" id="team">
+    {% if auction %}
+
+        {% if not auction.is_active and auction.current_team %}
+            SOLD TO {{ auction.current_team.name }} 🔥
+
+        {% elif auction.current_team %}
+            {{ auction.current_team.name }}
+
+        {% else %}
+            None
+
+        {% endif %}
+
+    {% else %}
+        No Auction
+    {% endif %}
+</div>
+
+        <div class="status" id="status">🔴 LIVE</div>
+
+    </div>
+</div>
+<script>
+function fetchAuction(){
+    fetch("/get-auction/")
+    .then(res => res.json())
+    .then(data => {
+
+        // Player & Price
+        document.getElementById("playerName").innerText = data.player;
+        document.getElementById("price").innerText = "₹ " + data.price;
+
+        // 🔥 TEAM DISPLAY LOGIC USING BOOLEAN
+        if(data.is_sold){
+            document.getElementById("status").innerText = "🔨 SOLD";
+            document.getElementById("team").innerText =
+                "SOLD TO " + data.team + " 🔥";
+        }
+        else if(data.team){
+            document.getElementById("status").innerText = "🔴 LIVE";
+            document.getElementById("team").innerText = data.team;
+        }
+        else{
+            document.getElementById("status").innerText = "🔴 LIVE";
+            document.getElementById("team").innerText = "None";
+        }
+
+    });
+}
+
+setInterval(fetchAuction,1000);
+</script>
+</body>
+</html>
