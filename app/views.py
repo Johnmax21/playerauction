@@ -47,24 +47,48 @@ def get_auction(request):
 from django.http import JsonResponse
 import json
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Auction, Team
+import json
 def place_bid(request):
-    import json
-    data = json.loads(request.body)
+    
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"})
+
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"})
+
     team_id = data.get("team_id")
+    player_id = data.get("player_id")
+    print(f"Received player_id: {player_id}, team_id: {team_id}")  # Debug: What ID is actually sent?
+    if not team_id or not player_id:
+        return JsonResponse({"error": "Missing data"})
 
-    if not team_id:
-        return JsonResponse({"error": "No team selected"})
+    try:
+        team = Team.objects.get(id=int(team_id))
+        player = Player.objects.get(id=int(player_id))
+        print(player.name)
+    except Team.DoesNotExist:
+        return JsonResponse({"error": "Team not found"})
+    except Player.DoesNotExist:
+        return JsonResponse({"error": "Player not found"})
 
-    if not team_id.isdigit():
-        return JsonResponse({"error": "Invalid team ID"})
+    # ✅ Manual get or create
+    auction = Auction.objects.filter(player=player).first()
 
-    auction = Auction.objects.first()
-    team = Team.objects.get(id=int(team_id))
+    if not auction:
+        auction = Auction(
+            player=player,
+            current_price=player.base_price,
+            current_team=None
+        )
+        auction.save()
 
-    if not auction or not auction.player:
-        return JsonResponse({"error": "No active auction"})
-
-    new_price = auction.current_price + 50
+    increment = 50
+    new_price = auction.current_price + increment
 
     if team.remaining_purse < new_price:
         return JsonResponse({"error": "Insufficient purse"})
@@ -77,31 +101,80 @@ def place_bid(request):
         "price": auction.current_price,
         "team": team.name
     })
-def sell_player(request):
-    auction = Auction.objects.first()
-    player = auction.player
-    team = auction.current_team
-    price = auction.current_price
+# import json
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# from .models import Auction, Player, Team  # Adjust imports
 
-    if player and team:
-        player.team = team
-        player.sold_price = price
-        player.status = "sold"
-        player.save()
+# @csrf_exempt  # If not using CSRF in POST
+# def sell_player(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid request method"})
 
-        team.remaining_purse -= price
-        team.save()
+#     try:
+#         data = json.loads(request.body)
+#         player_id = data.get("player_id")
+#     except:
+#         return JsonResponse({"error": "Invalid JSON"})
 
-    # Reset auction
-    auction.player = None
-    auction.current_price = 0
-    auction.current_team = None
-    auction.save()
+#     if not player_id:
+#         return JsonResponse({"error": "Missing player_id"})
 
-    return JsonResponse({"status": "sold"})
+#     try:
+#         player = Player.objects.get(id=int(player_id))
+#         auction = Auction.objects.get(player=player)  # Get specific player's Auction
+#     except Player.DoesNotExist:
+#         return JsonResponse({"error": "Player not found"})
+#     except Auction.DoesNotExist:
+#         return JsonResponse({"error": "No auction for this player"})
+
+#     team = auction.current_team
+#     price = auction.current_price
+
+#     if player and team:
+#         player.team = team
+#         player.sold_price = price
+#         player.status = "sold"
+#         player.save()
+
+#         team.remaining_purse -= price
+#         team.save()
+
+#         # Reset this specific Auction
+#         auction.player = None
+#         auction.current_price = 0
+#         auction.current_team = None
+#         auction.status = "completed"  # Optional: Add status field to model
+#         auction.save()
+
+#     return JsonResponse({
+#         "status": "sold",
+#         "player": player.name,
+#         "team": team.name if team else "None",
+#         "price": price
+#     })
+from django.http import JsonResponse
+from .models import Auction
+import json
 
 def unsold_player(request):
-    auction = Auction.objects.first()
+   
+
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"})
+
+    player_id = data.get("player_id")
+
+    if not player_id or not str(player_id).isdigit():
+        return JsonResponse({"error": "Invalid player ID"})
+
+    try:
+        auction = Auction.objects.get(id=int(player_id))
+    except Auction.DoesNotExist:
+        return JsonResponse({"error": "Auction not found"})
+
     player = auction.player
 
     if player:
@@ -114,7 +187,6 @@ def unsold_player(request):
     auction.save()
 
     return JsonResponse({"status": "unsold"})
-
 
 from django.shortcuts import render, redirect
 from .models import Player
@@ -141,32 +213,21 @@ def add_player(request):
 from django.http import JsonResponse
 import json
 
+from django.http import JsonResponse
+import json
+
 def set_player(request):
-    import json
-    data = json.loads(request.body)
-    player_id = data.get("player_id")
+    if request.method == "POST":
+        data = json.loads(request.body)
+        player_id = data.get("player_id")
 
-    if not player_id:
-        return JsonResponse({"error": "No player selected"})
+        player = Player.objects.get(id=player_id)
 
-    player = Player.objects.get(id=player_id)
-
-    # Get or create auction
-    auction, created = Auction.objects.get_or_create(
-        id=1,
-        defaults={
-            "player": player,
-            "current_price": player.base_price
-        }
-    )
-
-    # If already exists, update it
-    auction.player = player
-    auction.current_price = player.base_price
-    auction.current_team = None
-    auction.save()
-
-    return JsonResponse({"success": True})
+        return JsonResponse({
+            "player": player.name,
+            "price": player.base_price,
+            "team": player.team.name if player.team else None
+        })
     
 
 def team_page(request):
@@ -187,27 +248,32 @@ def team_page(request):
         "teams": teams
     })
 
-from django.http import JsonResponse
-from .models import Auction
-
 import json
 from django.http import JsonResponse
-from .models import Auction
+from django.views.decorators.csrf import csrf_exempt  # If not already using
+from .models import Auction, Player, Team  # Adjust import as needed
 
+@csrf_exempt  # Or handle CSRF in middleware
 def mark_sold(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method"})
 
-    data = json.loads(request.body)
-    player_id = data.get("player_id")
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"})
 
+    player_id = data.get("player_id")
     if not player_id:
         return JsonResponse({"error": "Player ID missing"})
 
-    auction = Auction.objects.get(
-        id=player_id    )
-    print(player_id)
+    try:
+        player = Player.objects.get(id=int(player_id))
+    except Player.DoesNotExist:
+        return JsonResponse({"error": "Player not found"})
 
+    # ✅ Fetch Auction by player (like in place_bid)
+    auction = Auction.objects.filter(player=player).first()
     if not auction:
         return JsonResponse({"error": "No active auction found"})
 
@@ -216,7 +282,9 @@ def mark_sold(request):
 
     team = auction.current_team
 
-    # Deduct purse
+    # Deduct purse (only if not already deducted—add a check if needed)
+    if team.remaining_purse < auction.current_price:
+        return JsonResponse({"error": "Team has insufficient purse (already deducted?)"})
     team.remaining_purse -= auction.current_price
     team.save()
 
@@ -229,4 +297,52 @@ def mark_sold(request):
         "success": True,
         "team": team.name,
         "price": auction.current_price
+    })
+
+def manual_bid(request):
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"})
+
+    data = json.loads(request.body)
+
+    player_id = data.get("player_id")
+    team_id = data.get("team_id")
+    price = data.get("price")
+
+    if not player_id or not team_id or not price:
+        return JsonResponse({"error": "Missing data"})
+
+    try:
+        player = Player.objects.get(id=player_id)
+        team = Team.objects.get(id=team_id)
+        price = int(price)
+
+    except Player.DoesNotExist:
+        return JsonResponse({"error": "Player not found"})
+
+    except Team.DoesNotExist:
+        return JsonResponse({"error": "Team not found"})
+
+    auction = Auction.objects.filter(player=player).first()
+
+    if not auction:
+        auction = Auction(
+            player=player,
+            current_price=player.base_price
+        )
+
+    if price <= auction.current_price:
+        return JsonResponse({"error": "Bid must be higher than current price"})
+
+    if team.remaining_purse < price:
+        return JsonResponse({"error": "Insufficient purse"})
+
+    auction.current_price = price
+    auction.current_team = team
+    auction.save()
+
+    return JsonResponse({
+        "price": auction.current_price,
+        "team": team.name
     })

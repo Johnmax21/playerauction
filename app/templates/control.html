@@ -1,11 +1,36 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+    
 <head>
     <title>Admin Control</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
     <style>
+        .team-container{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.team-box{
+    padding:10px 15px;
+    background:#f1f1f1;
+    border-radius:8px;
+    cursor:pointer;
+    border:1px solid #ccc;
+    transition:0.2s;
+}
+
+.team-box:hover{
+    background:#ddd;
+}
+
+.team-box.active{
+    background:#4CAF50;
+    color:white;
+    border-color:#4CAF50;
+}
         body { background: linear-gradient(to right,#141E30,#243B55); }
         .card { margin-top:60px; width:60%; border-radius:20px; }
         .price { font-size:45px; font-weight:bold; color:#4CAF50; }
@@ -21,23 +46,22 @@
     <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge card w3-margin-auto">
 
         <!-- Search Player -->
-        <input class="w3-input w3-round-large w3-margin-bottom"
-               type="text"
-               id="searchInput"
-               placeholder="🔍 Search Player..."
-               onkeyup="filterPlayers()">
+      <input class="w3-input w3-round-large w3-margin-bottom"
+       type="text"
+       id="searchInput"
+       placeholder="🔍 Search Player..."
+       onkeyup="filterPlayers()">
 
-        <!-- Select Player -->
-        <select class="w3-select w3-round-large w3-margin-bottom"
-                id="playerSelect"
-                onchange="setPlayer()">
-            <option disabled selected>Select Player</option>
-            {% for player in players %}
-                <option value="{{ player.id }}">
-                    {{ player.name }} - ₹{{ player.base_price }}
-                </option>
-            {% endfor %}
-        </select>
+<select class="w3-select w3-round-large w3-margin-bottom"
+        id="playerSelect"
+        onchange="setPlayer()">
+    <option value="" disabled selected>Select Player</option>
+    {% for player in players %}
+        <option value="{{ player.id }}">
+            {{ player.name }} - ₹{{ player.base_price }}
+        </option>
+    {% endfor %}
+</select>
 
         <hr>
 
@@ -59,34 +83,50 @@
         </div>
 
         <!-- Select Team -->
-        <select id="teamSelect" class="w3-select w3-round-large">
-    <option value="" selected disabled>Select Team</option>
+   <div id="teamList" class="team-container">
     {% for team in teams %}
-        <option value="{{ team.id }}">{{ team.name }}</option>
+        <div class="team-box" onclick="selectTeam('{{ team.id }}', this)">
+            {{ team.name }}
+        </div>
     {% endfor %}
-</select>
+</div>
+
+<!-- Hidden field to store selected team -->
+<input type="hidden" id="teamSelect">
 
         <br>
 
         <!-- Bid Button -->
-        <button onclick="placeBid()"
-                class="w3-button w3-green w3-xlarge w3-round-large w3-margin-top">
-            + ₹50 BID
-        </button>
+      <button onclick="placeBid(document.getElementById('playerSelect').value)"
+        class="w3-button w3-green w3-xlarge w3-round-large w3-margin-top">
+    + ₹50 BID
+</button>
 
         <!-- Sold -->
- <button onclick="markSold({{ auction.id }})"
-        class="w3-button w3-red w3-round-large">
-    SOLD
+ <button onclick="markSold({{ auction.id }})" class="w3-button w3-red w3-xlarge w3-round-large w3-margin-top">
+    Mark Sold
 </button>
 
         <!-- Unsold -->
-                 <button onclick="unsoldPlayer()"
+                 <button onclick="unsoldPlayer({{ auction.id }})"
                 class="w3-button w3-grey w3-xlarge w3-round-large w3-margin-top">
             ❌ UNSOLD
         </button>
 
-        
+        <div class="w3-row w3-margin-top">
+
+    <input 
+        type="number" 
+        id="manualBid" 
+        placeholder="Enter bid amount"
+        class="w3-input w3-border w3-round-large"
+    >
+
+    <button onclick="manualBid()" class="w3-button w3-green w3-round-large w3-margin-top">
+        Place Manual Bid
+    </button>
+
+</div>
 
     </div>
 </div>
@@ -126,17 +166,12 @@ function unsoldPlayer(){
         }
     });
 }
-function filterPlayers(){
-    let input=document.getElementById("searchInput").value.toLowerCase();
-    let options=document.getElementById("playerSelect").options;
-    for(let i=0;i<options.length;i++){
-        options[i].style.display=
-        options[i].text.toLowerCase().includes(input)?"":"none";
-    }
-}
 
 function setPlayer(){
-    let id=document.getElementById("playerSelect").value;
+    let id = document.getElementById("playerSelect").value;
+
+    if(!id) return;   // Prevent empty selection
+
     fetch("/set-player/",{
         method:"POST",
         headers:{
@@ -147,37 +182,147 @@ function setPlayer(){
     })
     .then(res=>res.json())
     .then(data=>{
-        document.getElementById("playerName").innerText=data.name;
-        document.getElementById("price").innerText="₹ "+data.price;
-        document.getElementById("team").innerText="Current Team: None";
+        console.log(data); // Debug
+
+        document.getElementById("playerName").innerText = data.player;
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText =
+            "Current Team: " + (data.team || "None");
+    })
+    .catch(error=>{
+        console.error("Error:", error);
     });
 }
-function placeBid(){
-    let teamId = document.getElementById("teamSelect").value;
+function filterPlayers() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let select = document.getElementById("playerSelect");
+    let options = select.getElementsByTagName("option");
+
+    for (let i = 0; i < options.length; i++) {
+        let txt = options[i].textContent || options[i].innerText;
+
+        if (txt.toLowerCase().indexOf(input) > -1) {
+            options[i].style.display = "";
+        } else {
+            options[i].style.display = "none";
+        }
+    }
+}
+function placeBid(playerId) {
+    console.log("placeBid called with playerId:", playerId);  // e.g., 3 – already working
+
+    // ✅ Global team select (matches your HTML)
+    let teamSelect = document.getElementById("teamSelect");
+    let teamId = teamSelect ? teamSelect.value : null;
+
+    console.log("Found teamSelect element:", teamSelect);  // Should log the <select> element
+    console.log("Team ID from select:", teamId);  // Should log the selected value (e.g., 2) if chosen
+
+    if (!playerId) {
+        alert("Please select a player first!");
+        return;
+    }
 
     if (!teamId) {
         alert("Please select a team first!");
         return;
     }
 
+    console.log("Sending to backend: player_id=", playerId, ", team_id=", teamId);
+
     fetch("/place-bid/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            player_id: playerId,
+            team_id: teamId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Backend response:", data);  // e.g., {price: 80, team: "Team2"}
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        // Update global UI (matches your HTML IDs)
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText = "Current Team: " + data.team;
+
+        // Optional: Reset team select after bid (forces re-selection)
+        teamSelect.value = "";
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Bid failed – check console.");
+    });
+}
+function selectTeam(teamId, element){
+
+    // store selected value
+    document.getElementById("teamSelect").value = teamId;
+
+    // remove previous highlight
+    document.querySelectorAll(".team-box").forEach(box=>{
+        box.classList.remove("active");
+    });
+
+    // highlight selected box
+    element.classList.add("active");
+
+    console.log("Selected team:", teamId);
+}
+function manualBid(){
+
+    let playerId = document.getElementById("playerSelect").value;
+    let teamId = document.getElementById("teamSelect").value;
+    let bidPrice = document.getElementById("manualBid").value;
+
+    if(!playerId){
+        alert("Select player first!");
+        return;
+    }
+
+    if(!teamId){
+        alert("Select team!");
+        return;
+    }
+
+    if(!bidPrice){
+        alert("Enter bid amount!");
+        return;
+    }
+
+    fetch("/manual-bid/",{
         method:"POST",
         headers:{
             "Content-Type":"application/json",
             "X-CSRFToken":"{{ csrf_token }}"
         },
-        body:JSON.stringify({team_id: teamId})
+        body:JSON.stringify({
+            player_id:playerId,
+            team_id:teamId,
+            price:bidPrice
+        })
     })
     .then(res=>res.json())
     .then(data=>{
+
         if(data.error){
             alert(data.error);
             return;
         }
 
-        document.getElementById("price").innerText="₹ "+data.price;
-        document.getElementById("team").innerText="Current Team: "+data.team;
-    });
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText = "Current Team: " + data.team;
+
+        document.getElementById("manualBid").value = "";
+    })
 }
 </script>
 
