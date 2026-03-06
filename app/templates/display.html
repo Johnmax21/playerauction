@@ -3,8 +3,15 @@
 <html>
 <head>
 <title>Cricket Auction</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
 <style>
+@font-face {
+    font-family: 'AutoTechno';
+    src: url("{% static 'fonts/auto-techno.ttf' %}") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
@@ -15,14 +22,12 @@ box-sizing:border-box;
 }
 
 body{
+font-family:'AutoTechno', sans-serif;
+letter-spacing:2px;
 background:#000000;
-font-family:'Rajdhani',sans-serif;
-color:#e0e0e0;
-min-height:100vh;
-position:relative;
+color:#ffffff;
 overflow-x:hidden;
-display:flex;
-flex-direction:column;
+position:relative;
 }
 
 body::before{
@@ -32,10 +37,12 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:radial-gradient(circle at 20% 50%,rgba(255,255,255,0.05) 0%,transparent 50%),
-radial-gradient(circle at 80% 50%,rgba(255,255,255,0.05) 0%,transparent 50%);
+background:radial-gradient(circle at 20% 50%,rgba(0,212,255,0.15) 0%,transparent 50%),
+radial-gradient(circle at 80% 50%,rgba(0,255,255,0.1) 0%,transparent 50%),
+radial-gradient(circle at 50% 20%,rgba(124,58,237,0.1) 0%,transparent 50%);
 pointer-events:none;
 z-index:1;
+animation:pulseGlow 4s ease-in-out infinite;
 }
 
 body::after{
@@ -45,17 +52,67 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:linear-gradient(45deg,transparent 48%,rgba(255,255,255,0.02) 50%,transparent 52%),
-linear-gradient(-45deg,transparent 48%,rgba(255,255,255,0.02) 50%,transparent 52%);
-background-size:50px 50px;
+background:linear-gradient(45deg,transparent 48%,rgba(0,212,255,0.03) 50%,transparent 52%),
+linear-gradient(-45deg,transparent 48%,rgba(0,255,255,0.02) 50%,transparent 52%);
+background-size:60px 60px;
 pointer-events:none;
 z-index:1;
-animation:moveGrid 20s linear infinite;
+animation:moveGrid 15s linear infinite;
+}
+
+body::before{
+content:'';
+position:fixed;
+top:50%;
+left:50%;
+width:600px;
+height:600px;
+margin-top:-300px;
+margin-left:-300px;
+background:radial-gradient(circle,rgba(0,212,255,0.3) 0%,rgba(0,212,255,0.1) 30%,transparent 70%);
+border-radius:50%;
+pointer-events:none;
+z-index:0;
+animation:expandPulse 6s ease-in-out infinite;
+}
+
+body::after{
+content:'';
+position:fixed;
+top:50%;
+left:50%;
+width:400px;
+height:400px;
+margin-top:-200px;
+margin-left:-200px;
+background:radial-gradient(circle,rgba(0,255,255,0.2) 0%,transparent 40%);
+border-radius:50%;
+pointer-events:none;
+z-index:2;
+animation:rotatePulse 8s linear infinite;
 }
 
 @keyframes moveGrid{
 0%{background-position:0 0;}
-100%{background-position:50px 50px;}
+100%{background-position:60px 60px;}
+}
+
+@keyframes pulseGlow{
+0%,100%{opacity:0.6;transform:scale(1);}
+50%{opacity:1;transform:scale(1.1);}
+}
+
+@keyframes expandPulse{
+0%,100%{transform:scale(1);opacity:0.3;}
+50%{transform:scale(1.3);opacity:0.6;}
+}
+
+@keyframes rotatePulse{
+0%{transform:rotate(0deg) scale(1);opacity:0.4;}
+25%{transform:rotate(90deg) scale(1.1);opacity:0.6;}
+50%{transform:rotate(180deg) scale(1);opacity:0.4;}
+75%{transform:rotate(270deg) scale(1.1);opacity:0.6;}
+100%{transform:rotate(360deg) scale(1);opacity:0.4;}
 }
 
 /* HEADER */
@@ -63,7 +120,7 @@ animation:moveGrid 20s linear infinite;
 .auction-header{
 background:linear-gradient(135deg,rgba(26,26,46,0.95) 0%,rgba(42,42,62,0.95) 100%);
 backdrop-filter:blur(20px);
-padding:25px 50px;
+padding:15px 30px;
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -86,16 +143,17 @@ background:linear-gradient(90deg,transparent,#7c3aed,transparent);
 .player-main-info{
 display:flex;
 align-items:center;
-gap:30px;
+gap:20px;
 }
 
 .player-name{
-font-size:2.8rem;
-font-family:'Orbitron',sans-serif;
+font-size:2.2rem;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:900;
 color:#ffffff;
-text-shadow:0 0 30px rgba(124,58,237,0.6),
-0 0 60px rgba(124,58,237,0.3);
+text-shadow:0 0 15px rgba(124,58,237,0.3),
+0 0 25px rgba(124,58,237,0.15);
 letter-spacing:2px;
 position:relative;
 }
@@ -105,7 +163,7 @@ content:'';
 position:absolute;
 bottom:-8px;
 left:0;
-width:60px;
+width:40px;
 height:3px;
 background:linear-gradient(90deg,#7c3aed,#a855f7);
 border-radius:2px;
@@ -113,9 +171,9 @@ border-radius:2px;
 
 .player-role{
 background:linear-gradient(135deg,#7c3aed,#a855f7);
-padding:8px 20px;
-border-radius:25px;
-font-size:13px;
+padding:6px 15px;
+border-radius:20px;
+font-size:11px;
 font-family:'Exo 2',sans-serif;
 font-weight:600;
 letter-spacing:2px;
@@ -129,11 +187,11 @@ border:1px solid rgba(124,58,237,0.3);
 text-align:right;
 display:flex;
 flex-direction:column;
-gap:8px;
+gap:6px;
 }
 
 .status-label{
-font-size:10px;
+font-size:9px;
 font-family:'Exo 2',sans-serif;
 color:#888888;
 letter-spacing:3px;
@@ -142,12 +200,13 @@ opacity:0.8;
 }
 
 .status-value{
-font-size:16px;
-font-family:'Orbitron',sans-serif;
+font-size:14px;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:700;
 color:#7c3aed;
-text-shadow:0 0 10px rgba(124,58,237,0.5);
-letter-spacing:1px;
+text-shadow:0 0 5px rgba(124,58,237,0.25);
+letter-spacing:2px;
 }
 
 /* MAIN GRID */
@@ -155,17 +214,18 @@ letter-spacing:1px;
 .main-content-wrapper{
 display:grid;
 grid-template-columns:1.2fr 1fr 1fr;
-gap:60px;
-padding:40px 80px;
+gap:20px;
+padding:15px 30px;
 align-items:start;
 width:100%;
 max-width:100%;
+height:calc(100vh - 30px);
 }
 
 .main-content-wrapper > div{
 display:flex;
 flex-direction:column;
-gap:20px;
+gap:15px;
 }
 
 /* PLAYER DETAILS LEFT */
@@ -174,7 +234,7 @@ gap:20px;
 background:rgba(0,0,0,0.8);
 backdrop-filter:blur(15px);
 border-radius:20px;
-padding:30px;
+padding:20px;
 border:1px solid rgba(124,58,237,0.2);
 box-shadow:0 8px 32px rgba(0,0,0,0.5),
 inset 0 1px 0 rgba(255,255,255,0.1);
@@ -200,19 +260,21 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 position:relative;
-gap:20px;
+gap:10px;
+height:100%;
 }
 
 .player-name-above-image{
-font-size:2rem;
-font-family:'Orbitron',sans-serif;
+font-size:1.4rem;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:900;
 color:#ffffff;
-text-shadow:0 0 20px rgba(255,255,255,0.3),
-0 0 40px rgba(255,255,255,0.1);
+text-shadow:0 0 10px rgba(255,255,255,0.15),
+0 0 20px rgba(255,255,255,0.05);
 letter-spacing:2px;
 text-align:center;
-margin-bottom:10px;
+margin-bottom:5px;
 position:relative;
 }
 
@@ -222,33 +284,42 @@ position:absolute;
 bottom:-5px;
 left:50%;
 transform:translateX(-50%);
-width:80px;
+width:60px;
 height:2px;
 background:linear-gradient(90deg,transparent,#ffffff,transparent);
 border-radius:1px;
 }
 
+.player-position{
+font-size:11px;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#aaaaaa;
+margin-top:3px;
+font-family:'Exo 2',sans-serif;
+}
+
 .player-image-big{
-width: 350px;
-height: 350px;
-border-radius:25px;
-border:4px solid transparent;
+width: 220px;
+height: 220px;
+border-radius:20px;
+border:3px solid transparent;
 background:linear-gradient(#000000,#000000) padding-box,
 linear-gradient(135deg,#ffffff,#cccccc) border-box;
 object-fit:cover;
-box-shadow:0 0 40px rgba(255,255,255,0.2),
-0 10px 30px rgba(0,0,0,0.8),
-inset 0 0 20px rgba(255,255,255,0.1);
+box-shadow:0 0 20px rgba(255,255,255,0.1),
+0 5px 15px rgba(0,0,0,0.8),
+inset 0 0 10px rgba(255,255,255,0.05);
 transition:all 0.4s ease;
 position:relative;
-filter:grayscale(100%);
+
 }
 
 .player-image-big::before{
 content:'';
 position:absolute;
 inset:-4px;
-border-radius:25px;
+border-radius:20px;
 background:linear-gradient(135deg,#ffffff,#cccccc);
 z-index:-1;
 opacity:0.3;
@@ -258,9 +329,9 @@ transition:all 0.4s ease;
 
 .player-image-big:hover{
 transform:scale(1.05);
-box-shadow:0 0 60px rgba(255,255,255,0.4),
-0 15px 40px rgba(0,0,0,0.9);
-filter:grayscale(0%);
+box-shadow:0 0 30px rgba(255,255,255,0.2),
+0 10px 25px rgba(0,0,0,0.9);
+
 }
 
 .player-image-big:hover::before{
@@ -274,11 +345,11 @@ filter:blur(25px);
 background:rgba(0,0,0,0.8);
 backdrop-filter:blur(15px);
 border-radius:20px;
-padding:30px;
+padding:20px;
 border:1px solid rgba(124,58,237,0.2);
 box-shadow:0 8px 32px rgba(0,0,0,0.5),
 inset 0 1px 0 rgba(255,255,255,0.1);
-margin-bottom:30px;
+margin-bottom:20px;
 position:relative;
 overflow:hidden;
 }
@@ -294,11 +365,11 @@ background:linear-gradient(90deg,transparent,#7c3aed,transparent);
 }
 
 .player-info-heading{
-font-family:'Exo 2',sans-serif;
-font-size:1.4rem;
+font-family:'AutoTechno';
+font-size:1.2rem;
 font-weight:700;
 color:#7c3aed;
-margin-bottom:15px;
+margin-bottom:10px;
 letter-spacing:3px;
 text-transform:uppercase;
 position:relative;
@@ -310,7 +381,7 @@ content:'';
 position:absolute;
 bottom:-5px;
 left:0;
-width:40px;
+width:30px;
 height:2px;
 background:linear-gradient(90deg,#7c3aed,#a855f7);
 border-radius:1px;
@@ -318,16 +389,90 @@ border-radius:1px;
 
 .player-description{
 color:#cccccc;
-line-height:1.8;
-font-size:1.05rem;
+line-height:1.6;
+font-size:0.9rem;
 font-family:'Rajdhani',sans-serif;
 font-weight:400;
 text-align:justify;
 padding:0;
 position:relative;
-display:flex;
-align-items:center;
+display:block;
+flex-direction:column;
+align-items:flex-start;
+height:auto;
 min-height:auto;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 8px 32px rgba(0,0,0,0.6),
+inset 0 1px 0 rgba(255,255,255,0.05);
+overflow:hidden;
+margin:15px 10px 0 10px;
+transition:all 0.3s ease;
+}
+
+.player-description:hover{
+border-color:rgba(255,255,255,0.2);
+box-shadow:0 12px 40px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.1);
+transform:translateY(-2px);
+}
+
+.player-description::before{
+content:'PLAYER PROFILE';
+position:absolute;
+top:10px;
+left:20px;
+font-size:0.6rem;
+font-family:'Orbitron',sans-serif;
+color:#ffffff;
+background:linear-gradient(135deg,#7c3aed,#a855f7);
+padding:4px 12px;
+border-radius:10px;
+letter-spacing:2px;
+text-transform:uppercase;
+opacity:0.9;
+z-index:10;
+box-shadow:0 4px 15px rgba(124,58,237,0.4);
+}
+
+.profile-content{
+margin-top:30px;
+width:100%;
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.profile-header,
+.profile-details,
+.profile-skills,
+.profile-value{
+padding-left:10px;
+border-left:2px solid rgba(255,255,255,0.2);
+transition:all 0.3s ease;
+width:100%;
+}
+
+.profile-header:hover,
+.profile-details:hover,
+.profile-skills:hover,
+.profile-value:hover{
+border-left-color:rgba(255,255,255,0.5);
+padding-left:12px;
+}
+
+.profile-header strong,
+.profile-details strong,
+.profile-skills strong,
+.profile-value strong{
+color:#ffffff;
+font-weight:600;
+text-transform:uppercase;
+font-size:0.75rem;
+letter-spacing:1px;
+opacity:0.9;
 }
 
 /* STATS */
@@ -336,7 +481,7 @@ min-height:auto;
 background:rgba(0,0,0,0.9);
 backdrop-filter:blur(15px);
 border-radius:25px;
-padding:20px;
+padding:15px;
 border:1px solid rgba(255,255,255,0.1);
 box-shadow:0 8px 32px rgba(0,0,0,0.8),
 inset 0 1px 0 rgba(255,255,255,0.05);
@@ -344,7 +489,7 @@ position:relative;
 overflow:hidden;
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:18px;
+gap:12px;
 height:auto;
 min-height:auto;
 }
@@ -361,23 +506,24 @@ background:linear-gradient(90deg,transparent,#ffffff,transparent);
 
 .stats-header-mini{
 text-align:center;
-margin-bottom:25px;
+margin-bottom:20px;
 grid-column:1 / -1;
 }
 
 .stats-title{
-font-size:1.2rem;
-font-family:'Orbitron',sans-serif;
+font-size:1.1rem;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:700;
 color:#ffffff;
-text-shadow:0 0 15px rgba(255,255,255,0.3);
-letter-spacing:3px;
+text-shadow:0 0 8px rgba(255,255,255,0.15);
+letter-spacing:2px;
 text-transform:uppercase;
 margin-bottom:5px;
 }
 
 .stats-subtitle{
-font-size:0.8rem;
+font-size:0.7rem;
 font-family:'Exo 2',sans-serif;
 color:#aaaaaa;
 letter-spacing:2px;
@@ -387,12 +533,10 @@ opacity:0.8;
 .stat-card{
 background:rgba(0,0,0,0.9);
 backdrop-filter:blur(10px);
+padding:20px 15px;
 border-radius:20px;
-padding:25px 20px;
-text-align:center;
 border:1px solid rgba(255,255,255,0.1);
-box-shadow:0 8px 25px rgba(0,0,0,0.8),
-inset 0 1px 0 rgba(255,255,255,0.05);
+text-align:center;
 transition:all 0.4s ease;
 position:relative;
 overflow:hidden;
@@ -422,11 +566,11 @@ transform:translateX(0);
 }
 
 .stat-value{
-font-size:2.2rem;
-font-weight:900;
-font-family:'Orbitron',sans-serif;
+font-size:2rem;
+font-weight:800;
+font-family:'Orbitron', sans-serif;
 color:#ffffff;
-text-shadow:0 0 20px rgba(255,255,255,0.3);
+text-shadow:0 0 10px rgba(255,255,255,0.15);
 margin-bottom:8px;
 display:block;
 transition:all 0.3s ease;
@@ -435,17 +579,16 @@ transition:all 0.3s ease;
 .stat-card:hover .stat-value{
 color:#ffffff;
 transform:scale(1.1);
-text-shadow:0 0 30px rgba(255,255,255,0.5);
+text-shadow:0 0 15px rgba(255,255,255,0.25);
 }
 
 .stat-label{
-font-size:11px;
+font-size:10px;
 font-family:'Exo 2',sans-serif;
 font-weight:600;
 color:#aaaaaa;
 letter-spacing:3px;
 text-transform:uppercase;
-margin-top:8px;
 opacity:0.8;
 transition:all 0.3s ease;
 }
@@ -460,19 +603,19 @@ color:#ffffff;
 .auction-section{
 background:rgba(0,0,0,0.9);
 backdrop-filter:blur(15px);
-border-radius:25px;
+border-radius:20px;
 border:1px solid rgba(255,255,255,0.1);
 box-shadow:0 8px 32px rgba(0,0,0,0.8),
 inset 0 1px 0 rgba(255,255,255,0.05);
-padding:15px;
+padding:8px;
 position:relative;
 overflow:hidden;
 transition:all 0.3s ease;
-min-height:380px;
+min-height:auto;
 height:100%;
 display:grid;
 grid-template-rows:auto 1fr auto;
-gap:10px;
+gap:6px;
 }
 
 .auction-section::before{
@@ -488,14 +631,14 @@ background:linear-gradient(90deg,transparent,#ffffff,transparent);
 .auction-cards{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:25px;
+gap:12px;
 }
 
 .auction-card{
 background:rgba(0,0,0,0.95);
 backdrop-filter:blur(10px);
-padding:25px 20px;
-border-radius:18px;
+padding:10px;
+border-radius:15px;
 border:1px solid rgba(255,255,255,0.1);
 text-align:center;
 transition:all 0.4s ease;
@@ -528,22 +671,23 @@ opacity:1;
 
 .auction-header-mini{
 text-align:center;
-margin-bottom:25px;
+margin-bottom:20px;
 }
 
 .auction-title{
-font-size:1.2rem;
-font-family:'Orbitron',sans-serif;
+font-size:1.1rem;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:700;
 color:#ffffff;
-text-shadow:0 0 15px rgba(255,255,255,0.3);
-letter-spacing:3px;
+text-shadow:0 0 8px rgba(255,255,255,0.15);
+letter-spacing:2px;
 text-transform:uppercase;
 margin-bottom:5px;
 }
 
 .auction-subtitle{
-font-size:0.8rem;
+font-size:0.7rem;
 font-family:'Exo 2',sans-serif;
 color:#aaaaaa;
 letter-spacing:2px;
@@ -551,7 +695,7 @@ opacity:0.8;
 }
 
 .auction-icon{
-font-size:1.5rem;
+font-size:1.3rem;
 margin-bottom:8px;
 animation:iconPulse 2s ease-in-out infinite;
 }
@@ -562,7 +706,7 @@ animation:iconPulse 2s ease-in-out infinite;
 }
 
 .auction-desc{
-font-size:0.75rem;
+font-size:0.65rem;
 font-family:'Rajdhani',sans-serif;
 color:#888888;
 margin-top:8px;
@@ -574,20 +718,20 @@ font-style:italic;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-top:20px;
-padding-top:15px;
+margin-top:15px;
+padding-top:10px;
 border-top:1px solid rgba(255,255,255,0.1);
 }
 
 .auction-time, .auction-bidders{
-font-size:0.85rem;
+font-size:0.75rem;
 font-family:'Exo 2',sans-serif;
 color:#cccccc;
 opacity:0.8;
 }
 
 .stat-icon{
-font-size:1.2rem;
+font-size:1.1rem;
 margin-bottom:10px;
 opacity:0.8;
 }
@@ -599,7 +743,7 @@ transition:all 0.3s ease;
 }
 
 .stat-desc{
-font-size:0.7rem;
+font-size:0.6rem;
 font-family:'Rajdhani',sans-serif;
 color:#888888;
 margin-top:5px;
@@ -612,151 +756,55 @@ opacity:0.9;
 }
 
 .auction-value{
-font-size:1.8rem;
-font-weight:900;
-font-family:'Orbitron',sans-serif;
+font-size:1.6rem;
+font-weight:800;
+font-family:'Orbitron', sans-serif;
 color:#ffffff;
-text-shadow:0 0 15px rgba(255,255,255,0.3);
+text-shadow:0 0 8px rgba(255,255,255,0.15);
 transition:all 0.3s ease;
 }
 
 .auction-card:hover .auction-value{
 transform:scale(1.05);
 color:#ffffff;
-text-shadow:0 0 25px rgba(255,255,255,0.5);
-}
-
-.player-description{
-color:#cccccc;
-line-height:1.8;
-font-size:1.05rem;
-font-family:'Rajdhani',sans-serif;
-font-weight:400;
-text-align:justify;
-padding:25px 30px;
-position:relative;
-display:block;
-flex-direction:column;
-align-items:flex-start;
-height:auto;
-min-height:auto;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(10px);
-border-radius:20px;
-border:1px solid rgba(255,255,255,0.1);
-box-shadow:0 8px 32px rgba(0,0,0,0.6),
-inset 0 1px 0 rgba(255,255,255,0.05);
-overflow:hidden;
-margin:20px 10px 0 10px;
-transition:all 0.3s ease;
-}
-
-.player-description:hover{
-border-color:rgba(255,255,255,0.2);
-box-shadow:0 12px 40px rgba(0,0,0,0.8),
-inset 0 1px 0 rgba(255,255,255,0.1);
-transform:translateY(-2px);
-}
-
-.player-description::before{
-content:'PLAYER PROFILE';
-position:absolute;
-top:15px;
-left:25px;
-font-size:0.7rem;
-font-family:'Orbitron',sans-serif;
-color:#ffffff;
-background:linear-gradient(135deg,#7c3aed,#a855f7);
-padding:6px 18px;
-border-radius:12px;
-letter-spacing:2px;
-text-transform:uppercase;
-opacity:0.9;
-z-index:10;
-box-shadow:0 4px 15px rgba(124,58,237,0.4);
-}
-
-.profile-content{
-margin-top:40px;
-width:100%;
-display:flex;
-flex-direction:column;
-gap:20px;
-}
-
-.profile-header,
-.profile-details,
-.profile-skills,
-.profile-value{
-padding-left:12px;
-border-left:3px solid rgba(255,255,255,0.2);
-transition:all 0.3s ease;
-width:100%;
-}
-
-.profile-header:hover,
-.profile-details:hover,
-.profile-skills:hover,
-.profile-value:hover{
-border-left-color:rgba(255,255,255,0.5);
-padding-left:15px;
-}
-
-.profile-header strong,
-.profile-details strong,
-.profile-skills strong,
-.profile-value strong{
-color:#ffffff;
-font-weight:600;
-text-transform:uppercase;
-font-size:0.85rem;
-letter-spacing:1px;
-opacity:0.9;
-}
-
-@keyframes soldAnimation{
-0%{
-transform:scale(1);
-box-shadow:0 8px 25px rgba(0,0,0,0.8),
-inset 0 1px 0 rgba(255,255,255,0.05);
-}
-50%{
-transform:scale(1.05);
-box-shadow:0 8px 25px rgba(0,0,0,0.8),
-0 0 20px rgba(124,58,237,0.6),
-inset 0 1px 0 rgba(255,255,255,0.1);
-}
-100%{
-transform:scale(1);
-box-shadow:0 8px 25px rgba(0,0,0,0.8),
-inset 0 1px 0 rgba(255,255,255,0.05);
-}
+text-shadow:0 0 12px rgba(255,255,255,0.25);
 }
 
 .status-container.sold-status{
 animation:soldAnimation 0.6s ease-in-out;
 }
 
+.status-container.sold-status::before{
+background:linear-gradient(90deg,transparent,#00d4ff,#00ffff,transparent);
+animation:statusGlow 3s ease-in-out infinite;
+}
+
+.status-container.sold-status .status-icon{
+filter:drop-shadow(0 0 5px rgba(0,212,255,0.4));
+}
+
+.status-container.sold-status .status-pulse{
+background:radial-gradient(circle,rgba(0,212,255,0.8),transparent);
+}
+
 /* Creative Status Container Styles */
 .status-container{
 background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(20,20,40,0.8));
 backdrop-filter:blur(20px);
-border-radius:20px;
+border-radius:15px;
 border:2px solid rgba(255,255,255,0.1);
-box-shadow:0 15px 45px rgba(0,0,0,0.8),
-0 0 60px rgba(124,58,237,0.3),
+box-shadow:0 8px 25px rgba(0,0,0,0.8),
+0 0 30px rgba(0,212,255,0.15),
 inset 0 1px 0 rgba(255,255,255,0.1),
 inset 0 -1px 0 rgba(0,0,0,0.3);
-padding:20px 30px;
-margin-top:25px;
+padding:10px;
+margin-top:15px;
 position:relative;
 overflow:hidden;
 transition:all 0.4s ease;
-min-height:100px;
+min-height:auto;
 width:100%;
 max-width:none;
-width:280%;
-margin-left:0%;
 }
 
 .status-container::before{
@@ -766,17 +814,17 @@ top:0;
 left:0;
 right:0;
 height:3px;
-background:linear-gradient(90deg,transparent,#7c3aed,#a855f7,transparent);
+background:linear-gradient(90deg,transparent,#00d4ff,#00ffff,transparent);
 animation:statusGlow 3s ease-in-out infinite;
 }
 
-.status-container:hover{
+.status-container.sold-status:hover{
 transform:translateY(-2px);
-box-shadow:0 20px 60px rgba(0,0,0,0.9),
-0 0 80px rgba(124,58,237,0.4),
+box-shadow:0 10px 30px rgba(0,0,0,0.9),
+0 0 40px rgba(0,212,255,0.2),
 inset 0 1px 0 rgba(255,255,255,0.15),
 inset 0 -1px 0 rgba(0,0,0,0.4);
-border-color:rgba(124,58,237,0.3);
+border-color:rgba(0,212,255,0.3);
 }
 
 @keyframes statusGlow{
@@ -790,16 +838,16 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
-gap:6px;
-margin-bottom:12px;
-padding-bottom:10px;
+gap:5px;
+margin-bottom:10px;
+padding-bottom:8px;
 border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
 .status-icon-wrapper{
 position:relative;
-width:45px;
-height:45px;
+width:40px;
+height:40px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -811,14 +859,14 @@ position:absolute;
 width:100%;
 height:100%;
 border-radius:50%;
-background:radial-gradient(circle,rgba(239,68,68,0.8),transparent);
+background:radial-gradient(circle,rgba(0,212,255,0.8),transparent);
 animation:pulse 2s ease-in-out infinite;
 }
 
 .status-icon{
-font-size:20px;
+font-size:18px;
 z-index:2;
-filter:drop-shadow(0 0 10px rgba(239,68,68,0.8));
+filter:drop-shadow(0 0 5px rgba(0,212,255,0.4));
 }
 
 @keyframes pulse{
@@ -831,18 +879,19 @@ flex:1;
 }
 
 .status-title{
-font-size:1rem;
-font-family:'Orbitron',sans-serif;
+font-size:0.9rem;
+font-family:'AutoTechno';
+font-style:italic;
 font-weight:700;
 color:#ffffff;
 letter-spacing:2px;
 text-transform:uppercase;
 margin-bottom:3px;
-text-shadow:0 0 20px rgba(124,58,237,0.5);
+text-shadow:0 0 10px rgba(0,212,255,0.25);
 }
 
 .status-subtitle{
-font-size:0.75rem;
+font-size:0.65rem;
 font-family:'Rajdhani',sans-serif;
 color:#cccccc;
 opacity:0.8;
@@ -852,18 +901,19 @@ font-style:italic;
 .status-content{
 display:flex;
 flex-direction:column;
-gap:10px;
+gap:8px;
 }
 
 .status-main{
 display:flex;
 align-items:center;
-justify-content:space-between;
-gap:20px;
-padding:15px;
+justify-content:center;
+gap:15px;
+padding:10px;
 background:rgba(0,0,0,0.4);
 border-radius:12px;
 border:1px solid rgba(255,255,255,0.05);
+margin-bottom:12px;
 }
 
 .status-main > .status-details:first-child{
@@ -879,14 +929,80 @@ order:3;
 }
 
 .status-value{
-font-size:2rem;
-font-family:'Orbitron',sans-serif;
-font-weight:900;
-color:#ffffff;
-text-shadow:0 0 30px rgba(239,68,68,0.8);
-letter-spacing:3px;
+font-size:1.8rem;
+font-family:'AutoTechno';
+font-style:italic;
+font-weight:700;
+color:#00d4ff;
+text-shadow:0 0 15px rgba(0,212,255,0.9);
+letter-spacing:2px;
 text-transform:uppercase;
 animation:statusFlicker 3s ease-in-out infinite;
+transition:all 0.5s ease;
+}
+
+.status-value.sold{
+color:#e91e63;
+text-shadow:0 0 30px rgba(233,30,99,1),
+0 0 60px rgba(233,30,99,0.8),
+0 0 90px rgba(233,30,99,0.6),
+0 0 120px rgba(233,30,99,0.4),
+0 0 150px rgba(233,30,99,0.2);
+animation:soldThudd 0.6s ease-out;
+font-weight:900;
+transform:scale(1);
+}
+
+@keyframes soldThudd{
+0%{
+transform:scale(1);
+opacity:0;
+filter:brightness(0.5);
+}
+15%{
+transform:scale(1.8);
+opacity:1;
+filter:brightness(2.5);
+}
+30%{
+transform:scale(1.4);
+opacity:1;
+filter:brightness(1.8);
+}
+45%{
+transform:scale(1.6);
+opacity:1;
+filter:brightness(2.2);
+}
+60%{
+transform:scale(1.2);
+opacity:1;
+filter:brightness(1.5);
+}
+75%{
+transform:scale(1.35);
+opacity:1;
+filter:brightness(1.9);
+}
+90%{
+transform:scale(1.25);
+opacity:1;
+filter:brightness(1.6);
+}
+100%{
+transform:scale(1.3);
+opacity:1;
+filter:brightness(1.8);
+}
+}
+
+@keyframes soldGlow{
+0%,100%{
+opacity:0.3;
+}
+50%{
+opacity:1;
+}
 }
 
 @keyframes statusFlicker{
@@ -896,36 +1012,36 @@ animation:statusFlicker 3s ease-in-out infinite;
 
 .status-divider{
 width:2px;
-height:35px;
+height:50px;
 background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.3),transparent);
 }
 
-.status-details{
-flex:1;
+.status-details-section{
 display:flex;
 flex-direction:column;
-gap:8px;
+gap:15px;
+margin-bottom:12px;
 }
 
 .status-info{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:6px 12px;
+padding:15px 20px;
 background:rgba(255,255,255,0.03);
-border-radius:6px;
-border-left:3px solid rgba(124,58,237,0.6);
+border-radius:10px;
+border-left:2px solid rgba(0,212,255,0.6);
 transition:all 0.3s ease;
 }
 
 .status-info:hover{
 background:rgba(255,255,255,0.06);
-border-left-color:rgba(124,58,237,0.9);
+border-left-color:rgba(0,212,255,0.9);
 transform:translateX(3px);
 }
 
 .status-label{
-font-size:0.7rem;
+font-size:0.9rem;
 font-family:'Exo 2',sans-serif;
 color:#888888;
 text-transform:uppercase;
@@ -933,7 +1049,7 @@ letter-spacing:1px;
 }
 
 .status-text{
-font-size:0.8rem;
+font-size:1.1rem;
 font-family:'Rajdhani',sans-serif;
 color:#ffffff;
 font-weight:600;
@@ -942,13 +1058,13 @@ font-weight:600;
 .status-progress{
 display:flex;
 flex-direction:column;
-gap:8px;
+gap:15px;
 }
 
 .progress-bar{
-height:6px;
+height:10px;
 background:rgba(255,255,255,0.1);
-border-radius:8px;
+border-radius:15px;
 overflow:hidden;
 position:relative;
 }
@@ -956,8 +1072,8 @@ position:relative;
 .progress-fill{
 height:100%;
 width:65%;
-background:linear-gradient(90deg,#7c3aed,#a855f7);
-border-radius:8px;
+background:linear-gradient(90deg,#00d4ff,#00ffff);
+border-radius:15px;
 animation:progressPulse 2s ease-in-out infinite;
 position:relative;
 }
@@ -968,7 +1084,7 @@ top:0;
 left:0;
 right:0;
 bottom:0;
-background:linear-gradient(90deg,transparent,rgba(124,58,237,0.6),transparent);
+background:linear-gradient(90deg,transparent,rgba(0,212,255,0.6),transparent);
 animation:progressGlow 2s linear infinite;
 }
 
@@ -983,7 +1099,7 @@ animation:progressGlow 2s linear infinite;
 }
 
 .progress-label{
-font-size:0.7rem;
+font-size:1.1rem;
 font-family:'Exo 2',sans-serif;
 color:#888888;
 text-align:center;
@@ -995,18 +1111,18 @@ letter-spacing:1px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding-top:12px;
+padding-top:22px;
 border-top:1px solid rgba(255,255,255,0.1);
 }
 
 .status-timestamp{
 display:flex;
-gap:8px;
+gap:18px;
 align-items:center;
 }
 
 .time-label{
-font-size:0.7rem;
+font-size:1.1rem;
 font-family:'Exo 2',sans-serif;
 color:#888888;
 text-transform:uppercase;
@@ -1014,7 +1130,7 @@ letter-spacing:1px;
 }
 
 .time-value{
-font-size:0.8rem;
+font-size:1.2rem;
 font-family:'Rajdhani',sans-serif;
 color:#ffffff;
 font-weight:600;
@@ -1022,26 +1138,455 @@ font-weight:600;
 
 .status-indicators{
 display:flex;
-gap:6px;
+gap:15px;
 }
 
 .indicator{
-width:6px;
-height:6px;
+width:10px;
+height:10px;
 border-radius:50%;
 background:rgba(255,255,255,0.2);
 transition:all 0.3s ease;
 }
 
 .indicator.active{
-background:#7c3aed;
-box-shadow:0 0 10px rgba(124,58,237,0.8);
+background:#00d4ff;
+box-shadow:0 0 20px rgba(0,212,255,0.8);
 animation:indicatorPulse 2s ease-in-out infinite;
 }
 
 @keyframes indicatorPulse{
 0%,100%{transform:scale(1);}
 50%{transform:scale(1.2);}
+}
+
+/* AUCTION STAGE LAYOUT */
+
+.auction-stage{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:60px;
+max-width:1600px;
+margin:auto;
+height:100vh;
+padding:40px 80px;
+}
+
+.player-panel{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:18px;
+}
+
+.player-image-big{
+width:320px;
+height:320px;
+border-radius:20px;
+border:2px solid rgba(0,212,255,0.3);
+background:linear-gradient(#000000,#000000) padding-box,
+linear-gradient(135deg,#ffffff,#cccccc) border-box;
+object-fit:cover;
+box-shadow:0 0 20px rgba(255,255,255,0.1),
+0 5px 15px rgba(0,0,0,0.8),
+inset 0 0 10px rgba(255,255,255,0.05),
+0 0 30px rgba(0,212,255,0.2);
+transition:all 0.4s ease;
+position:relative;
+z-index:1;
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:-5px;
+left:-5px;
+right:-5px;
+bottom:-5px;
+background:linear-gradient(45deg,
+rgba(0,212,255,0.6),
+rgba(0,255,255,0.4),
+rgba(124,58,237,0.3),
+rgba(0,212,255,0.6),
+rgba(0,255,255,0.4));
+background-size:300% 300%;
+border-radius:25px;
+z-index:-1;
+animation:flowyGlow 4s ease-in-out infinite;
+opacity:0.9;
+filter:blur(8px);
+}
+
+.player-image-big::after{
+content:'';
+position:absolute;
+top:-8px;
+left:-8px;
+right:-8px;
+bottom:-8px;
+background:radial-gradient(circle at 30% 70%,
+rgba(0,255,255,0.5) 0%,
+transparent 50%,
+rgba(0,212,255,0.4) 100%),
+radial-gradient(circle at 70% 30%,
+rgba(124,58,237,0.4) 0%,
+transparent 50%,
+rgba(0,255,255,0.3) 100%);
+background-size:200% 200%;
+border-radius:28px;
+z-index:-2;
+animation:flowyPulse 5s ease-in-out infinite reverse;
+opacity:0.7;
+filter:blur(12px);
+}
+
+@keyframes flowyGlow{
+0%{
+background-position:0% 0%;
+transform:rotate(0deg) scale(1);
+}
+25%{
+background-position:100% 0%;
+transform:rotate(90deg) scale(1.05);
+}
+50%{
+background-position:100% 100%;
+transform:rotate(180deg) scale(1);
+}
+75%{
+background-position:0% 100%;
+transform:rotate(270deg) scale(1.05);
+}
+100%{
+background-position:0% 0%;
+transform:rotate(360deg) scale(1);
+}
+}
+
+@keyframes flowyPulse{
+0%{
+background-position:0% 0%;
+transform:scale(1) rotate(0deg);
+opacity:0.7;
+}
+33%{
+background-position:50% 0%;
+transform:scale(1.1) rotate(120deg);
+opacity:0.9;
+}
+66%{
+background-position:100% 50%;
+transform:scale(1) rotate(240deg);
+opacity:0.8;
+}
+100%{
+background-position:0% 100%;
+transform:scale(1) rotate(360deg);
+opacity:0.7;
+}
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:linear-gradient(90deg, 
+transparent 0%, 
+rgba(0,212,255,0.4) 25%, 
+rgba(0,255,255,0.6) 50%, 
+rgba(0,212,255,0.4) 75%, 
+transparent 100%);
+background-size:200% 100%;
+border-radius:20px;
+z-index:2;
+animation:waveOver 3s linear infinite;
+opacity:0.8;
+filter:blur(3px);
+pointer-events:none;
+}
+
+@keyframes waveOver{
+0%{ background-position:0% 50%; }
+100%{ background-position:200% 50%; }
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:-3px;
+left:-3px;
+right:-3px;
+bottom:-3px;
+background:linear-gradient(90deg, #00d4ff, #00ffff, #00d4ff);
+background-size:200% 100%;
+border-radius:23px;
+z-index:-1;
+animation:wave 3s linear infinite;
+opacity:0.8;
+filter:blur(6px);
+}
+
+@keyframes wave{
+0%{ background-position:0% 50%; }
+100%{ background-position:200% 50%; }
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:-4px;
+left:-4px;
+right:-4px;
+bottom:-4px;
+background:linear-gradient(45deg,
+#00d4ff,
+#00ffff,
+#00d4ff,
+#00ffff);
+background-size:200% 200%;
+border-radius:24px;
+z-index:-1;
+animation:wavyNeon 3s ease-in-out infinite;
+opacity:0.9;
+filter:blur(6px);
+}
+
+.player-image-big::after{
+content:'';
+position:absolute;
+top:-2px;
+left:-2px;
+right:-2px;
+bottom:-2px;
+background:linear-gradient(90deg,
+transparent,
+#00d4ff,
+#00ffff,
+#00d4ff,
+transparent);
+background-size:300% 100%;
+border-radius:22px;
+z-index:-1;
+animation:wavyFlow 4s linear infinite;
+opacity:0.7;
+filter:blur(4px);
+}
+
+@keyframes wavyNeon{
+0%{
+background-position:0% 50%;
+transform:scale(1) rotate(0deg);
+}
+25%{
+background-position:100% 0%;
+transform:scale(1.02) rotate(1deg);
+}
+50%{
+background-position:100% 100%;
+transform:scale(1) rotate(0deg);
+}
+75%{
+background-position:0% 100%;
+transform:scale(1.02) rotate(-1deg);
+}
+100%{
+background-position:0% 50%;
+transform:scale(1) rotate(0deg);
+}
+}
+
+@keyframes wavyFlow{
+0%{
+background-position:0% 50%;
+}
+50%{
+background-position:100% 50%;
+}
+100%{
+background-position:0% 50%;
+}
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:-3px;
+left:-3px;
+right:-3px;
+bottom:-3px;
+background:linear-gradient(90deg, #00d4ff, #00ffff, #00d4ff);
+background-size:200% 100%;
+border-radius:23px;
+z-index:-1;
+animation:wave 3s linear infinite;
+opacity:0.8;
+filter:blur(6px);
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+top:-3px;
+left:-3px;
+right:-3px;
+bottom:-3px;
+background:linear-gradient(90deg, #00d4ff, #00ffff, #00d4ff);
+background-size:200% 100%;
+border-radius:23px;
+z-index:-1;
+animation:wave 3s linear infinite;
+opacity:0.8;
+filter:blur(6px);
+}
+
+@keyframes wave{
+0%{ background-position:0% 50%; }
+100%{ background-position:200% 50%; }
+}
+
+
+.player-image-big::before{
+content:'';
+position:absolute;
+inset:-3px;
+border-radius:20px;
+background:linear-gradient(135deg,#ffffff,#cccccc);
+z-index:-1;
+opacity:0.3;
+filter:blur(20px);
+transition:all 0.4s ease;
+}
+
+.player-image-big:hover{
+transform:scale(1.05);
+box-shadow:0 0 30px rgba(255,255,255,0.2),
+0 10px 25px rgba(0,0,0,0.9);
+
+}
+
+.player-image-big:hover::before{
+opacity:0.6;
+filter:blur(25px);
+}
+
+.base-price-display{
+font-size:60px;
+font-family:'Orbitron', sans-serif;
+font-weight:800;
+color:#00d4ff;
+text-align:center;
+margin-top:15px;
+letter-spacing:2px;
+text-shadow:0 0 12px rgba(0,212,255,0.4);
+}
+
+.base-price-label{
+font-size:14px;
+font-family:'AutoTechno';
+font-style:italic;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#aaaaaa;
+text-align:center;
+margin-top:5px;
+}
+
+.player-info-panel{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:30px;
+text-align:center;
+}
+
+.player-info-panel h1{
+font-size:3.5rem;
+font-family:'AutoTechno';
+font-style:italic;
+font-weight:900;
+color:#ffffff;
+text-shadow:0 0 15px rgba(255,255,255,0.25),
+0 0 30px rgba(255,255,255,0.15);
+letter-spacing:2px;
+text-align:center;
+margin:0;
+position:relative;
+}
+
+.player-info-panel h1::after{
+content:'';
+position:absolute;
+bottom:-10px;
+left:50%;
+transform:translateX(-50%);
+width:80px;
+height:3px;
+background:linear-gradient(90deg,transparent,#ffffff,transparent);
+border-radius:2px;
+}
+
+.player-position{
+font-size:20px;
+font-family:'AutoTechno';
+font-style:italic;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#aaaaaa;
+margin-top:20px;
+}
+
+.live-bid-box,
+.team-box{
+background:rgba(0,0,0,0.8);
+padding:30px 50px;
+border-radius:18px;
+border:1px solid rgba(255,255,255,0.1);
+backdrop-filter:blur(10px);
+box-shadow:0 8px 25px rgba(0,0,0,0.6),
+inset 0 1px 0 rgba(255,255,255,0.05);
+transition:all 0.3s ease;
+}
+
+.live-bid-box:hover,
+.team-box:hover{
+transform:translateY(-2px);
+border-color:rgba(255,255,255,0.2);
+box-shadow:0 12px 30px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.live-bid-box .label,
+.team-box .label{
+font-size:15px;
+font-family:'AutoTechno';
+font-style:italic;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#888888;
+margin-bottom:12px;
+}
+
+.live-bid-box div:last-child,
+.team-box div:last-child{
+font-size:2.8rem;
+font-family:'Orbitron', sans-serif;
+font-weight:800;
+color:#00d4ff;
+text-shadow:0 0 12px rgba(0,212,255,0.4);
+letter-spacing:2px;
+}
+
+.team-box div:last-child{
+color:#ffffff;
+text-shadow:0 0 15px rgba(255,255,255,0.3);
+}
+
+.status-panel{
+width:440px;
 }
 
 /* Responsive Design */
@@ -1071,72 +1616,38 @@ height:200px;
 
 <body>
 
-<!-- MAIN GRID -->
+<!-- AUCTION STAGE LAYOUT -->
 
+<div class="auction-stage">
 
-<div class="main-content-wrapper">
-
-<!-- LEFT - AUCTION DETAILS AND PLAYER PROFILE -->
-
-<div>
-<div class="auction-section">
-
-<div class="auction-header-mini">
-<div class="auction-title">AUCTION DETAILS</div>
-<div class="auction-subtitle">Live Cricket Player Auction</div>
-</div>
-
-<div class="auction-cards">
-
-<div class="auction-card">
-<div class="auction-label">BASE PRICE</div>
-<div class="auction-value" id="basePrice">₹50 Lakhs</div>
-<div class="auction-desc">Starting bid amount</div>
-</div>
-
-<div class="auction-card">
-<div class="auction-label">CURRENT BID</div>
-<div class="auction-value" id="currentBid">₹85 Lakhs</div>
-<div class="auction-desc">Highest current offer</div>
-</div>
-
-<div class="auction-card">
-<div class="auction-label">SOLD TEAM</div>
-<div class="auction-value" id="soldTeam">RCB</div>
-<div class="auction-desc">Franchise owner</div>
-</div>
-
-<div class="auction-card">
-<div class="auction-label">TIME REMAINING</div>
-<div class="auction-value"> 02:45:30</div>
-<div class="auction-desc">Auction countdown</div>
-</div>
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-<!-- CENTER - PLAYER IMAGE AND STATUS -->
-
-<div class="player-image-left">
-
-<h3 class="player-name-above-image" id="playerName">
-{% if auction.player %} {{ auction.player.name }}
-{% else %} Virat Kohli {% endif %}
-</h3>
-
+<div class="player-panel">
 <img src="/media/players/virat kohli.jpg"
 class="player-image-big"
 id="playerImage"
 onerror="this.src='https://via.placeholder.com/260x260/7c3aed/ffffff?text=PLAYER'">
+<div class="base-price-display" id="basePriceHighlight">₹50 Lakhs</div>
+<div class="base-price-label">BASE PRICE</div>
+</div>
 
+<div class="player-info-panel">
+<h1 id="playerName">
+{% if auction.player %} {{ auction.player.name }}
+{% else %} Virat Kohli {% endif %}
+</h1>
+<div id="playerPosition" class="player-position">Batsman</div>
+
+<div class="live-bid-box">
+<div class="label">CURRENT BID</div>
+<div id="currentBid">₹85 Lakhs</div>
+</div>
+
+<div class="team-box">
+<div class="label">CURRENT TEAM</div>
+<div id="soldTeam">RCB</div>
+</div>
+</div>
+
+<div class="status-panel">
 <div class="status-container">
 <div class="status-header">
 <div class="status-icon-wrapper">
@@ -1152,6 +1663,9 @@ onerror="this.src='https://via.placeholder.com/260x260/7c3aed/ffffff?text=PLAYER
 <div class="status-content">
 <div class="status-main">
 <div class="status-value" id="auctionStatusCard">LIVE</div>
+</div>
+
+<div class="status-details-section">
 <div class="status-details">
 <div class="status-info">
 <span class="status-label">Phase</span>
@@ -1187,105 +1701,31 @@ onerror="this.src='https://via.placeholder.com/260x260/7c3aed/ffffff?text=PLAYER
 </div>
 </div>
 </div>
-
-</div>
-
-<!-- RIGHT - PLAYER STATS -->
-
-<div>
-<div class="stats-section">
-
-<div class="stats-header-mini">
-<div class="stats-title">PLAYER STATS</div>
-<div class="stats-subtitle">Career Performance Metrics</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-value" id="matches">72</div>
-<div class="stat-label">MATCHES</div>
-<div class="stat-desc">Career appearances</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-value" id="wickets">91</div>
-<div class="stat-label">WICKETS</div>
-<div class="stat-desc">Total dismissals</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-value" id="bestFigures">5/17</div>
-<div class="stat-label">BEST FIGURES</div>
-<div class="stat-desc">Peak performance</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-value" id="economy">8.18</div>
-<div class="stat-label">ECONOMY</div>
-<div class="stat-desc">Runs per over</div>
 </div>
 
 </div>
-</div>
 
-</div>
-<div class="player-description" id="playerDescription">
-
-{% if auction.player.description %}
-{{ auction.player.description }}
-{% else %}
-<div class="profile-content">
-<div class="profile-header">
-<strong>Virat Kohli</strong> - One of the modern cricket's greatest batsmen and a phenomenal leader. Known for his aggressive batting style, incredible consistency, and unmatched fitness levels.
-</div>
-
-<div class="profile-details">
-<strong>Career Highlights:</strong> Former Indian captain, ICC Player of the Year, and holder of numerous batting records across all formats of the game. His ability to chase targets and perform under pressure makes him invaluable in any T20 franchise setup.
-</div>
-
-<div class="profile-skills">
-<strong>Key Attributes:</strong> Exceptional cover drive, precise timing between wickets, and tactical acumen. Brings wealth of experience from international cricket and IPL leadership. Perfect mentor for young players and reliable finisher in death overs.
-</div>
-
-<div class="profile-value">
-<strong>Auction Value:</strong> Premium asset with proven track record of delivering match-winning performances. His brand value and leadership qualities make him an automatic choice for any franchise looking to build a championship-winning team.
-</div>
-</div>
-{% endif %}
-
-</div>
 <script>
 
 let currentStatus = '';
 
 function fetchAuction(){
-fetch("/get-auction/")
-.then(res=>res.json())
-.then(data=>{
+    fetch("/get-auction/")
+    .then(res=>res.json())
+    .then(data=>{
 
 if(data.player){
 document.getElementById("playerName").innerText=data.player
 }
 
 if(data.role){
-document.getElementById("playerRole").innerText=data.role
-}
-
-if(data.description){
-document.getElementById("playerDescription").innerText=data.description
+document.getElementById("playerPosition").innerText=data.role
 }
 
 if(data.player_image){
 document.getElementById("playerImage").src=data.player_image
 }
 
-if(data.stats){
-
-document.getElementById("matches").innerText=data.stats.matches
-document.getElementById("wickets").innerText=data.stats.wickets
-document.getElementById("bestFigures").innerText=data.stats.best_figures
-document.getElementById("economy").innerText=data.stats.economy
-
-}
 
 if(data.auction){
 
@@ -1293,6 +1733,7 @@ const newStatus = data.auction.status;
 document.getElementById("auctionStatus").innerText=newStatus
 document.getElementById("auctionStatusCard").innerText=newStatus
 document.getElementById("basePrice").innerText=data.auction.base_price
+document.getElementById("basePriceHighlight").innerText=data.auction.base_price
 document.getElementById("currentBid").innerText=data.auction.current_bid
 document.getElementById("soldTeam").innerText=data.auction.sold_team
 
