@@ -2,82 +2,1319 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live Auction</title>
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <style>
-        body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);}
-        .price{font-size:60px;font-weight:bold;color:#4CAF50;}
-        .team{font-size:30px;color:#FFC107;}
-        .status{font-size:30px;margin-top:10px;}
-    </style>
-</head>
+<title>Cricket Auction</title>
 
-<body class="w3-text-white">
-<div class="w3-container w3-center">
+<style>
 
-    <h1 class="w3-xxxlarge w3-padding-16">🏏 LIVE AUCTION</h1>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
-    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge">
-
-        <h2 id="playerName">
-            {% if auction.player %} {{ auction.player.name }}
-            {% else %} Waiting... {% endif %}
-        </h2>
-
-        <div class="price" id="price">₹ {{ auction.current_price }}</div>
-
-        <div class="team" id="team">
-    {% if auction %}
-
-        {% if not auction.is_active and auction.current_team %}
-            SOLD TO {{ auction.current_team.name }} 🔥
-
-        {% elif auction.current_team %}
-            {{ auction.current_team.name }}
-
-        {% else %}
-            None
-
-        {% endif %}
-
-    {% else %}
-        No Auction
-    {% endif %}
-</div>
-
-        <div class="status" id="status">🔴 LIVE</div>
-
-    </div>
-</div>
-<script>
-function fetchAuction(){
-    fetch("/get-auction/")
-    .then(res => res.json())
-    .then(data => {
-
-        // Player & Price
-        document.getElementById("playerName").innerText = data.player;
-        document.getElementById("price").innerText = "₹ " + data.price;
-
-        // 🔥 TEAM DISPLAY LOGIC USING BOOLEAN
-        if(data.is_sold){
-            document.getElementById("status").innerText = "🔨 SOLD";
-            document.getElementById("team").innerText =
-                "SOLD TO " + data.team + " 🔥";
-        }
-        else if(data.team){
-            document.getElementById("status").innerText = "🔴 LIVE";
-            document.getElementById("team").innerText = data.team;
-        }
-        else{
-            document.getElementById("status").innerText = "🔴 LIVE";
-            document.getElementById("team").innerText = "None";
-        }
-
-    });
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-setInterval(fetchAuction,1000);
+body{
+background:#000000;
+font-family:'Rajdhani',sans-serif;
+color:#e0e0e0;
+min-height:100vh;
+position:relative;
+overflow-x:hidden;
+display:flex;
+flex-direction:column;
+}
+
+body::before{
+content:'';
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:radial-gradient(circle at 20% 50%,rgba(255,255,255,0.05) 0%,transparent 50%),
+radial-gradient(circle at 80% 50%,rgba(255,255,255,0.05) 0%,transparent 50%);
+pointer-events:none;
+z-index:1;
+}
+
+body::after{
+content:'';
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:linear-gradient(45deg,transparent 48%,rgba(255,255,255,0.02) 50%,transparent 52%),
+linear-gradient(-45deg,transparent 48%,rgba(255,255,255,0.02) 50%,transparent 52%);
+background-size:50px 50px;
+pointer-events:none;
+z-index:1;
+animation:moveGrid 20s linear infinite;
+}
+
+@keyframes moveGrid{
+0%{background-position:0 0;}
+100%{background-position:50px 50px;}
+}
+
+/* HEADER */
+
+.auction-header{
+background:linear-gradient(135deg,rgba(26,26,46,0.95) 0%,rgba(42,42,62,0.95) 100%);
+backdrop-filter:blur(20px);
+padding:25px 50px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:2px solid rgba(124,58,237,0.3);
+box-shadow:0 8px 32px rgba(0,0,0,0.3);
+position:relative;
+z-index:10;
+}
+
+.auction-header::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:1px;
+background:linear-gradient(90deg,transparent,#7c3aed,transparent);
+}
+
+.player-main-info{
+display:flex;
+align-items:center;
+gap:30px;
+}
+
+.player-name{
+font-size:2.8rem;
+font-family:'Orbitron',sans-serif;
+font-weight:900;
+color:#ffffff;
+text-shadow:0 0 30px rgba(124,58,237,0.6),
+0 0 60px rgba(124,58,237,0.3);
+letter-spacing:2px;
+position:relative;
+}
+
+.player-name::after{
+content:'';
+position:absolute;
+bottom:-8px;
+left:0;
+width:60px;
+height:3px;
+background:linear-gradient(90deg,#7c3aed,#a855f7);
+border-radius:2px;
+}
+
+.player-role{
+background:linear-gradient(135deg,#7c3aed,#a855f7);
+padding:8px 20px;
+border-radius:25px;
+font-size:13px;
+font-family:'Exo 2',sans-serif;
+font-weight:600;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#ffffff;
+box-shadow:0 4px 15px rgba(124,58,237,0.4);
+border:1px solid rgba(124,58,237,0.3);
+}
+
+.auction-status{
+text-align:right;
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.status-label{
+font-size:10px;
+font-family:'Exo 2',sans-serif;
+color:#888888;
+letter-spacing:3px;
+text-transform:uppercase;
+opacity:0.8;
+}
+
+.status-value{
+font-size:16px;
+font-family:'Orbitron',sans-serif;
+font-weight:700;
+color:#7c3aed;
+text-shadow:0 0 10px rgba(124,58,237,0.5);
+letter-spacing:1px;
+}
+
+/* MAIN GRID */
+
+.main-content-wrapper{
+display:grid;
+grid-template-columns:1.2fr 1fr 1fr;
+gap:60px;
+padding:40px 80px;
+align-items:start;
+width:100%;
+max-width:100%;
+}
+
+.main-content-wrapper > div{
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+/* PLAYER DETAILS LEFT */
+
+.player-details-left{
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(15px);
+border-radius:20px;
+padding:30px;
+border:1px solid rgba(124,58,237,0.2);
+box-shadow:0 8px 32px rgba(0,0,0,0.5),
+inset 0 1px 0 rgba(255,255,255,0.1);
+position:relative;
+overflow:hidden;
+}
+
+.player-details-left::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:2px;
+background:linear-gradient(90deg,transparent,#7c3aed,transparent);
+}
+
+/* PLAYER IMAGE */
+
+.player-image-left{
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+position:relative;
+gap:20px;
+}
+
+.player-name-above-image{
+font-size:2rem;
+font-family:'Orbitron',sans-serif;
+font-weight:900;
+color:#ffffff;
+text-shadow:0 0 20px rgba(255,255,255,0.3),
+0 0 40px rgba(255,255,255,0.1);
+letter-spacing:2px;
+text-align:center;
+margin-bottom:10px;
+position:relative;
+}
+
+.player-name-above-image::after{
+content:'';
+position:absolute;
+bottom:-5px;
+left:50%;
+transform:translateX(-50%);
+width:80px;
+height:2px;
+background:linear-gradient(90deg,transparent,#ffffff,transparent);
+border-radius:1px;
+}
+
+.player-image-big{
+width: 350px;
+height: 350px;
+border-radius:25px;
+border:4px solid transparent;
+background:linear-gradient(#000000,#000000) padding-box,
+linear-gradient(135deg,#ffffff,#cccccc) border-box;
+object-fit:cover;
+box-shadow:0 0 40px rgba(255,255,255,0.2),
+0 10px 30px rgba(0,0,0,0.8),
+inset 0 0 20px rgba(255,255,255,0.1);
+transition:all 0.4s ease;
+position:relative;
+filter:grayscale(100%);
+}
+
+.player-image-big::before{
+content:'';
+position:absolute;
+inset:-4px;
+border-radius:25px;
+background:linear-gradient(135deg,#ffffff,#cccccc);
+z-index:-1;
+opacity:0.3;
+filter:blur(20px);
+transition:all 0.4s ease;
+}
+
+.player-image-big:hover{
+transform:scale(1.05);
+box-shadow:0 0 60px rgba(255,255,255,0.4),
+0 15px 40px rgba(0,0,0,0.9);
+filter:grayscale(0%);
+}
+
+.player-image-big:hover::before{
+opacity:0.6;
+filter:blur(25px);
+}
+
+/* CENTER INFO */
+
+.player-details-center{
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(15px);
+border-radius:20px;
+padding:30px;
+border:1px solid rgba(124,58,237,0.2);
+box-shadow:0 8px 32px rgba(0,0,0,0.5),
+inset 0 1px 0 rgba(255,255,255,0.1);
+margin-bottom:30px;
+position:relative;
+overflow:hidden;
+}
+
+.player-details-center::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:2px;
+background:linear-gradient(90deg,transparent,#7c3aed,transparent);
+}
+
+.player-info-heading{
+font-family:'Exo 2',sans-serif;
+font-size:1.4rem;
+font-weight:700;
+color:#7c3aed;
+margin-bottom:15px;
+letter-spacing:3px;
+text-transform:uppercase;
+position:relative;
+display:inline-block;
+}
+
+.player-info-heading::after{
+content:'';
+position:absolute;
+bottom:-5px;
+left:0;
+width:40px;
+height:2px;
+background:linear-gradient(90deg,#7c3aed,#a855f7);
+border-radius:1px;
+}
+
+.player-description{
+color:#cccccc;
+line-height:1.8;
+font-size:1.05rem;
+font-family:'Rajdhani',sans-serif;
+font-weight:400;
+text-align:justify;
+padding:0;
+position:relative;
+display:flex;
+align-items:center;
+min-height:auto;
+}
+
+/* STATS */
+
+.stats-section{
+background:rgba(0,0,0,0.9);
+backdrop-filter:blur(15px);
+border-radius:25px;
+padding:20px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 8px 32px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.05);
+position:relative;
+overflow:hidden;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:18px;
+height:auto;
+min-height:auto;
+}
+
+.stats-section::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:2px;
+background:linear-gradient(90deg,transparent,#ffffff,transparent);
+}
+
+.stats-header-mini{
+text-align:center;
+margin-bottom:25px;
+grid-column:1 / -1;
+}
+
+.stats-title{
+font-size:1.2rem;
+font-family:'Orbitron',sans-serif;
+font-weight:700;
+color:#ffffff;
+text-shadow:0 0 15px rgba(255,255,255,0.3);
+letter-spacing:3px;
+text-transform:uppercase;
+margin-bottom:5px;
+}
+
+.stats-subtitle{
+font-size:0.8rem;
+font-family:'Exo 2',sans-serif;
+color:#aaaaaa;
+letter-spacing:2px;
+opacity:0.8;
+}
+
+.stat-card{
+background:rgba(0,0,0,0.9);
+backdrop-filter:blur(10px);
+border-radius:20px;
+padding:25px 20px;
+text-align:center;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 8px 25px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.05);
+transition:all 0.4s ease;
+position:relative;
+overflow:hidden;
+}
+
+.stat-card::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:3px;
+background:linear-gradient(90deg,transparent,#ffffff,transparent);
+transform:translateX(-100%);
+transition:transform 0.4s ease;
+}
+
+.stat-card:hover{
+transform:translateY(-8px) scale(1.02);
+border-color:rgba(255,255,255,0.3);
+box-shadow:0 15px 40px rgba(255,255,255,0.1),
+inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.stat-card:hover::before{
+transform:translateX(0);
+}
+
+.stat-value{
+font-size:2.2rem;
+font-weight:900;
+font-family:'Orbitron',sans-serif;
+color:#ffffff;
+text-shadow:0 0 20px rgba(255,255,255,0.3);
+margin-bottom:8px;
+display:block;
+transition:all 0.3s ease;
+}
+
+.stat-card:hover .stat-value{
+color:#ffffff;
+transform:scale(1.1);
+text-shadow:0 0 30px rgba(255,255,255,0.5);
+}
+
+.stat-label{
+font-size:11px;
+font-family:'Exo 2',sans-serif;
+font-weight:600;
+color:#aaaaaa;
+letter-spacing:3px;
+text-transform:uppercase;
+margin-top:8px;
+opacity:0.8;
+transition:all 0.3s ease;
+}
+
+.stat-card:hover .stat-label{
+opacity:1;
+color:#ffffff;
+}
+
+/* AUCTION */
+
+.auction-section{
+background:rgba(0,0,0,0.9);
+backdrop-filter:blur(15px);
+border-radius:25px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 8px 32px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.05);
+padding:15px;
+position:relative;
+overflow:hidden;
+transition:all 0.3s ease;
+min-height:380px;
+height:100%;
+display:grid;
+grid-template-rows:auto 1fr auto;
+gap:10px;
+}
+
+.auction-section::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:2px;
+background:linear-gradient(90deg,transparent,#ffffff,transparent);
+}
+
+.auction-cards{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:25px;
+}
+
+.auction-card{
+background:rgba(0,0,0,0.95);
+backdrop-filter:blur(10px);
+padding:25px 20px;
+border-radius:18px;
+border:1px solid rgba(255,255,255,0.1);
+text-align:center;
+transition:all 0.4s ease;
+position:relative;
+overflow:hidden;
+}
+
+.auction-card::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:1px;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+opacity:0;
+transition:opacity 0.3s ease;
+}
+
+.auction-card:hover{
+transform:translateY(-5px);
+border-color:rgba(255,255,255,0.3);
+box-shadow:0 10px 30px rgba(255,255,255,0.1),
+inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.auction-card:hover::before{
+opacity:1;
+}
+
+.auction-header-mini{
+text-align:center;
+margin-bottom:25px;
+}
+
+.auction-title{
+font-size:1.2rem;
+font-family:'Orbitron',sans-serif;
+font-weight:700;
+color:#ffffff;
+text-shadow:0 0 15px rgba(255,255,255,0.3);
+letter-spacing:3px;
+text-transform:uppercase;
+margin-bottom:5px;
+}
+
+.auction-subtitle{
+font-size:0.8rem;
+font-family:'Exo 2',sans-serif;
+color:#aaaaaa;
+letter-spacing:2px;
+opacity:0.8;
+}
+
+.auction-icon{
+font-size:1.5rem;
+margin-bottom:8px;
+animation:iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse{
+0%,100%{transform:scale(1);}
+50%{transform:scale(1.1);}
+}
+
+.auction-desc{
+font-size:0.75rem;
+font-family:'Rajdhani',sans-serif;
+color:#888888;
+margin-top:8px;
+opacity:0.7;
+font-style:italic;
+}
+
+.auction-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:20px;
+padding-top:15px;
+border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.auction-time, .auction-bidders{
+font-size:0.85rem;
+font-family:'Exo 2',sans-serif;
+color:#cccccc;
+opacity:0.8;
+}
+
+.stat-icon{
+font-size:1.2rem;
+margin-bottom:10px;
+opacity:0.8;
+}
+
+.stat-card:hover .stat-icon{
+opacity:1;
+transform:scale(1.2);
+transition:all 0.3s ease;
+}
+
+.stat-desc{
+font-size:0.7rem;
+font-family:'Rajdhani',sans-serif;
+color:#888888;
+margin-top:5px;
+opacity:0.6;
+font-style:italic;
+}
+
+.stat-card:hover .stat-desc{
+opacity:0.9;
+}
+
+.auction-value{
+font-size:1.8rem;
+font-weight:900;
+font-family:'Orbitron',sans-serif;
+color:#ffffff;
+text-shadow:0 0 15px rgba(255,255,255,0.3);
+transition:all 0.3s ease;
+}
+
+.auction-card:hover .auction-value{
+transform:scale(1.05);
+color:#ffffff;
+text-shadow:0 0 25px rgba(255,255,255,0.5);
+}
+
+.player-description{
+color:#cccccc;
+line-height:1.8;
+font-size:1.05rem;
+font-family:'Rajdhani',sans-serif;
+font-weight:400;
+text-align:justify;
+padding:25px 30px;
+position:relative;
+display:block;
+flex-direction:column;
+align-items:flex-start;
+height:auto;
+min-height:auto;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 8px 32px rgba(0,0,0,0.6),
+inset 0 1px 0 rgba(255,255,255,0.05);
+overflow:hidden;
+margin:20px 10px 0 10px;
+transition:all 0.3s ease;
+}
+
+.player-description:hover{
+border-color:rgba(255,255,255,0.2);
+box-shadow:0 12px 40px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.1);
+transform:translateY(-2px);
+}
+
+.player-description::before{
+content:'PLAYER PROFILE';
+position:absolute;
+top:15px;
+left:25px;
+font-size:0.7rem;
+font-family:'Orbitron',sans-serif;
+color:#ffffff;
+background:linear-gradient(135deg,#7c3aed,#a855f7);
+padding:6px 18px;
+border-radius:12px;
+letter-spacing:2px;
+text-transform:uppercase;
+opacity:0.9;
+z-index:10;
+box-shadow:0 4px 15px rgba(124,58,237,0.4);
+}
+
+.profile-content{
+margin-top:40px;
+width:100%;
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.profile-header,
+.profile-details,
+.profile-skills,
+.profile-value{
+padding-left:12px;
+border-left:3px solid rgba(255,255,255,0.2);
+transition:all 0.3s ease;
+width:100%;
+}
+
+.profile-header:hover,
+.profile-details:hover,
+.profile-skills:hover,
+.profile-value:hover{
+border-left-color:rgba(255,255,255,0.5);
+padding-left:15px;
+}
+
+.profile-header strong,
+.profile-details strong,
+.profile-skills strong,
+.profile-value strong{
+color:#ffffff;
+font-weight:600;
+text-transform:uppercase;
+font-size:0.85rem;
+letter-spacing:1px;
+opacity:0.9;
+}
+
+@keyframes soldAnimation{
+0%{
+transform:scale(1);
+box-shadow:0 8px 25px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.05);
+}
+50%{
+transform:scale(1.05);
+box-shadow:0 8px 25px rgba(0,0,0,0.8),
+0 0 20px rgba(124,58,237,0.6),
+inset 0 1px 0 rgba(255,255,255,0.1);
+}
+100%{
+transform:scale(1);
+box-shadow:0 8px 25px rgba(0,0,0,0.8),
+inset 0 1px 0 rgba(255,255,255,0.05);
+}
+}
+
+.status-container.sold-status{
+animation:soldAnimation 0.6s ease-in-out;
+}
+
+/* Creative Status Container Styles */
+.status-container{
+background:linear-gradient(135deg,rgba(0,0,0,0.9),rgba(20,20,40,0.8));
+backdrop-filter:blur(20px);
+border-radius:20px;
+border:2px solid rgba(255,255,255,0.1);
+box-shadow:0 15px 45px rgba(0,0,0,0.8),
+0 0 60px rgba(124,58,237,0.3),
+inset 0 1px 0 rgba(255,255,255,0.1),
+inset 0 -1px 0 rgba(0,0,0,0.3);
+padding:20px 30px;
+margin-top:25px;
+position:relative;
+overflow:hidden;
+transition:all 0.4s ease;
+min-height:100px;
+width:100%;
+max-width:none;
+width:280%;
+margin-left:0%;
+}
+
+.status-container::before{
+content:'';
+position:absolute;
+top:0;
+left:0;
+right:0;
+height:3px;
+background:linear-gradient(90deg,transparent,#7c3aed,#a855f7,transparent);
+animation:statusGlow 3s ease-in-out infinite;
+}
+
+.status-container:hover{
+transform:translateY(-2px);
+box-shadow:0 20px 60px rgba(0,0,0,0.9),
+0 0 80px rgba(124,58,237,0.4),
+inset 0 1px 0 rgba(255,255,255,0.15),
+inset 0 -1px 0 rgba(0,0,0,0.4);
+border-color:rgba(124,58,237,0.3);
+}
+
+@keyframes statusGlow{
+0%,100%{opacity:0.3;}
+50%{opacity:1;}
+}
+
+.status-header{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+gap:6px;
+margin-bottom:12px;
+padding-bottom:10px;
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.status-icon-wrapper{
+position:relative;
+width:45px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+}
+
+.status-pulse{
+position:absolute;
+width:100%;
+height:100%;
+border-radius:50%;
+background:radial-gradient(circle,rgba(239,68,68,0.8),transparent);
+animation:pulse 2s ease-in-out infinite;
+}
+
+.status-icon{
+font-size:20px;
+z-index:2;
+filter:drop-shadow(0 0 10px rgba(239,68,68,0.8));
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(1);opacity:1;}
+50%{transform:scale(1.2);opacity:0.7;}
+}
+
+.status-title-wrapper{
+flex:1;
+}
+
+.status-title{
+font-size:1rem;
+font-family:'Orbitron',sans-serif;
+font-weight:700;
+color:#ffffff;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-bottom:3px;
+text-shadow:0 0 20px rgba(124,58,237,0.5);
+}
+
+.status-subtitle{
+font-size:0.75rem;
+font-family:'Rajdhani',sans-serif;
+color:#cccccc;
+opacity:0.8;
+font-style:italic;
+}
+
+.status-content{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.status-main{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
+padding:15px;
+background:rgba(0,0,0,0.4);
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.status-main > .status-details:first-child{
+order:1;
+}
+
+.status-main > .status-value{
+order:2;
+}
+
+.status-main > .status-details:last-child{
+order:3;
+}
+
+.status-value{
+font-size:2rem;
+font-family:'Orbitron',sans-serif;
+font-weight:900;
+color:#ffffff;
+text-shadow:0 0 30px rgba(239,68,68,0.8);
+letter-spacing:3px;
+text-transform:uppercase;
+animation:statusFlicker 3s ease-in-out infinite;
+}
+
+@keyframes statusFlicker{
+0%,100%{opacity:1;}
+95%{opacity:0.8;}
+}
+
+.status-divider{
+width:2px;
+height:35px;
+background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.3),transparent);
+}
+
+.status-details{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.status-info{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:6px 12px;
+background:rgba(255,255,255,0.03);
+border-radius:6px;
+border-left:3px solid rgba(124,58,237,0.6);
+transition:all 0.3s ease;
+}
+
+.status-info:hover{
+background:rgba(255,255,255,0.06);
+border-left-color:rgba(124,58,237,0.9);
+transform:translateX(3px);
+}
+
+.status-label{
+font-size:0.7rem;
+font-family:'Exo 2',sans-serif;
+color:#888888;
+text-transform:uppercase;
+letter-spacing:1px;
+}
+
+.status-text{
+font-size:0.8rem;
+font-family:'Rajdhani',sans-serif;
+color:#ffffff;
+font-weight:600;
+}
+
+.status-progress{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.progress-bar{
+height:6px;
+background:rgba(255,255,255,0.1);
+border-radius:8px;
+overflow:hidden;
+position:relative;
+}
+
+.progress-fill{
+height:100%;
+width:65%;
+background:linear-gradient(90deg,#7c3aed,#a855f7);
+border-radius:8px;
+animation:progressPulse 2s ease-in-out infinite;
+position:relative;
+}
+
+.progress-glow{
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:linear-gradient(90deg,transparent,rgba(124,58,237,0.6),transparent);
+animation:progressGlow 2s linear infinite;
+}
+
+@keyframes progressPulse{
+0%,100%{opacity:0.8;}
+50%{opacity:1;}
+}
+
+@keyframes progressGlow{
+0%{transform:translateX(-100%);}
+100%{transform:translateX(100%);}
+}
+
+.progress-label{
+font-size:0.7rem;
+font-family:'Exo 2',sans-serif;
+color:#888888;
+text-align:center;
+text-transform:uppercase;
+letter-spacing:1px;
+}
+
+.status-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding-top:12px;
+border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.status-timestamp{
+display:flex;
+gap:8px;
+align-items:center;
+}
+
+.time-label{
+font-size:0.7rem;
+font-family:'Exo 2',sans-serif;
+color:#888888;
+text-transform:uppercase;
+letter-spacing:1px;
+}
+
+.time-value{
+font-size:0.8rem;
+font-family:'Rajdhani',sans-serif;
+color:#ffffff;
+font-weight:600;
+}
+
+.status-indicators{
+display:flex;
+gap:6px;
+}
+
+.indicator{
+width:6px;
+height:6px;
+border-radius:50%;
+background:rgba(255,255,255,0.2);
+transition:all 0.3s ease;
+}
+
+.indicator.active{
+background:#7c3aed;
+box-shadow:0 0 10px rgba(124,58,237,0.8);
+animation:indicatorPulse 2s ease-in-out infinite;
+}
+
+@keyframes indicatorPulse{
+0%,100%{transform:scale(1);}
+50%{transform:scale(1.2);}
+}
+
+/* Responsive Design */
+@media(max-width:1000px){
+.main-content-grid{
+grid-template-columns:1fr;
+}
+
+.stats-section{
+grid-template-columns:1fr 1fr;
+}
+
+.auction-cards{
+grid-template-columns:1fr;
+}
+
+.player-image-big{
+width:200px;
+height:200px;
+}
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- MAIN GRID -->
+
+
+<div class="main-content-wrapper">
+
+<!-- LEFT - AUCTION DETAILS AND PLAYER PROFILE -->
+
+<div>
+<div class="auction-section">
+
+<div class="auction-header-mini">
+<div class="auction-title">AUCTION DETAILS</div>
+<div class="auction-subtitle">Live Cricket Player Auction</div>
+</div>
+
+<div class="auction-cards">
+
+<div class="auction-card">
+<div class="auction-label">BASE PRICE</div>
+<div class="auction-value" id="basePrice">₹50 Lakhs</div>
+<div class="auction-desc">Starting bid amount</div>
+</div>
+
+<div class="auction-card">
+<div class="auction-label">CURRENT BID</div>
+<div class="auction-value" id="currentBid">₹85 Lakhs</div>
+<div class="auction-desc">Highest current offer</div>
+</div>
+
+<div class="auction-card">
+<div class="auction-label">SOLD TEAM</div>
+<div class="auction-value" id="soldTeam">RCB</div>
+<div class="auction-desc">Franchise owner</div>
+</div>
+
+<div class="auction-card">
+<div class="auction-label">TIME REMAINING</div>
+<div class="auction-value"> 02:45:30</div>
+<div class="auction-desc">Auction countdown</div>
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+<!-- CENTER - PLAYER IMAGE AND STATUS -->
+
+<div class="player-image-left">
+
+<h3 class="player-name-above-image" id="playerName">
+{% if auction.player %} {{ auction.player.name }}
+{% else %} Virat Kohli {% endif %}
+</h3>
+
+<img src="/media/players/virat kohli.jpg"
+class="player-image-big"
+id="playerImage"
+onerror="this.src='https://via.placeholder.com/260x260/7c3aed/ffffff?text=PLAYER'">
+
+<div class="status-container">
+<div class="status-header">
+<div class="status-icon-wrapper">
+<div class="status-pulse"></div>
+<div class="status-icon">🔴</div>
+</div>
+<div class="status-title-wrapper">
+<div class="status-title">AUCTION STATUS</div>
+<div class="status-subtitle">Live bidding in progress</div>
+</div>
+</div>
+
+<div class="status-content">
+<div class="status-main">
+<div class="status-value" id="auctionStatusCard">LIVE</div>
+<div class="status-details">
+<div class="status-info">
+<span class="status-label">Phase</span>
+<span class="status-text">Active Bidding</span>
+</div>
+</div>
+<div class="status-details">
+<div class="status-info">
+<span class="status-label">Activity</span>
+<span class="status-text">High Competition</span>
+</div>
+</div>
+</div>
+
+<div class="status-progress">
+<div class="progress-bar">
+<div class="progress-fill"></div>
+<div class="progress-glow"></div>
+</div>
+<div class="progress-label">Auction Progress: 65%</div>
+</div>
+
+<div class="status-footer">
+<div class="status-timestamp">
+<span class="time-label">Started:</span>
+<span class="time-value">14:30:00</span>
+</div>
+<div class="status-indicators">
+<div class="indicator active"></div>
+<div class="indicator"></div>
+<div class="indicator"></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- RIGHT - PLAYER STATS -->
+
+<div>
+<div class="stats-section">
+
+<div class="stats-header-mini">
+<div class="stats-title">PLAYER STATS</div>
+<div class="stats-subtitle">Career Performance Metrics</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-value" id="matches">72</div>
+<div class="stat-label">MATCHES</div>
+<div class="stat-desc">Career appearances</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-value" id="wickets">91</div>
+<div class="stat-label">WICKETS</div>
+<div class="stat-desc">Total dismissals</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-value" id="bestFigures">5/17</div>
+<div class="stat-label">BEST FIGURES</div>
+<div class="stat-desc">Peak performance</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-value" id="economy">8.18</div>
+<div class="stat-label">ECONOMY</div>
+<div class="stat-desc">Runs per over</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="player-description" id="playerDescription">
+
+{% if auction.player.description %}
+{{ auction.player.description }}
+{% else %}
+<div class="profile-content">
+<div class="profile-header">
+<strong>Virat Kohli</strong> - One of the modern cricket's greatest batsmen and a phenomenal leader. Known for his aggressive batting style, incredible consistency, and unmatched fitness levels.
+</div>
+
+<div class="profile-details">
+<strong>Career Highlights:</strong> Former Indian captain, ICC Player of the Year, and holder of numerous batting records across all formats of the game. His ability to chase targets and perform under pressure makes him invaluable in any T20 franchise setup.
+</div>
+
+<div class="profile-skills">
+<strong>Key Attributes:</strong> Exceptional cover drive, precise timing between wickets, and tactical acumen. Brings wealth of experience from international cricket and IPL leadership. Perfect mentor for young players and reliable finisher in death overs.
+</div>
+
+<div class="profile-value">
+<strong>Auction Value:</strong> Premium asset with proven track record of delivering match-winning performances. His brand value and leadership qualities make him an automatic choice for any franchise looking to build a championship-winning team.
+</div>
+</div>
+{% endif %}
+
+</div>
+<script>
+
+let currentStatus = '';
+
+function fetchAuction(){
+fetch("/get-auction/")
+.then(res=>res.json())
+.then(data=>{
+
+if(data.player){
+document.getElementById("playerName").innerText=data.player
+}
+
+if(data.role){
+document.getElementById("playerRole").innerText=data.role
+}
+
+if(data.description){
+document.getElementById("playerDescription").innerText=data.description
+}
+
+if(data.player_image){
+document.getElementById("playerImage").src=data.player_image
+}
+
+if(data.stats){
+
+document.getElementById("matches").innerText=data.stats.matches
+document.getElementById("wickets").innerText=data.stats.wickets
+document.getElementById("bestFigures").innerText=data.stats.best_figures
+document.getElementById("economy").innerText=data.stats.economy
+
+}
+
+if(data.auction){
+
+const newStatus = data.auction.status;
+document.getElementById("auctionStatus").innerText=newStatus
+document.getElementById("auctionStatusCard").innerText=newStatus
+document.getElementById("basePrice").innerText=data.auction.base_price
+document.getElementById("currentBid").innerText=data.auction.current_bid
+document.getElementById("soldTeam").innerText=data.auction.sold_team
+
+// Trigger sold animation when status changes to SOLD
+if(newStatus === 'SOLD' && currentStatus !== 'SOLD'){
+const statusCard = document.querySelector('.status-container');
+statusCard.classList.remove('sold-status');
+void statusCard.offsetWidth; // Force reflow
+statusCard.classList.add('sold-status');
+}
+
+currentStatus = newStatus;
+
+}
+
+})
+
+}
+
+setInterval(fetchAuction,1000)
+
 </script>
+
 </body>
 </html>
