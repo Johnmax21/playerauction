@@ -1771,18 +1771,18 @@ padding:15px 30px;
 border-radius:25px;
 background:rgba(0,0,0,0.8);
 border:1px solid rgba(255,255,255,0.1);
-color:#00eaff;
-text-shadow:0 0 3px rgba(0,234,255,0.6),
-0 0 6px rgba(0,234,255,0.4);
+color:#ff0000;
+text-shadow:0 0 3px rgba(255,0,0,0.6),
+0 0 6px rgba(255,0,0,0.4);
 transition:all 0.3s ease;
 }
 
 .sold-status-label.sold{
-color:#ff0000;
-border-color:rgba(255,0,0,0.4);
-text-shadow:0 0 5px rgba(255,0,0,0.7),
-0 0 10px rgba(255,0,0,0.5);
-background:rgba(255,0,0,0.1);
+color:#00ff00;
+border-color:rgba(0,255,0,0.4);
+text-shadow:0 0 5px rgba(0,255,0,0.7),
+0 0 10px rgba(0,255,0,0.5);
+background:rgba(0,255,0,0.1);
 animation:soldPulse 0.8s ease-out;
 }
 
@@ -1989,7 +1989,7 @@ document.getElementById("soldTeam").innerText=data.auction.sold_team
 
 // Update sold/unsold status
 if(newStatus.toUpperCase() === 'SOLD'){
-statusLabel.innerText = 'SOLD';
+statusLabel.innerText = 'SOLD TO ' + data.auction.sold_team;
 statusLabel.classList.add('sold');
 } else {
 statusLabel.innerText = 'UNSOLD';
