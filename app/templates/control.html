@@ -6,6 +6,7 @@
     <title>Admin Control</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
+<<<<<<< HEAD
 
 </head>
 
@@ -320,6 +321,169 @@ function unsoldPlayer(){
         if (data.error) alert(data.error);
     });
 }
+=======
+    <style>
+        .team-container{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.team-box{
+    padding:10px 15px;
+    background:#f1f1f1;
+    border-radius:8px;
+    cursor:pointer;
+    border:1px solid #ccc;
+    transition:0.2s;
+}
+
+.team-box:hover{
+    background:#ddd;
+}
+
+.team-box.active{
+    background:#4CAF50;
+    color:white;
+    border-color:#4CAF50;
+}
+        body { background: linear-gradient(to right,#141E30,#243B55); }
+        .card { margin-top:60px; width:60%; border-radius:20px; }
+        .price { font-size:45px; font-weight:bold; color:#4CAF50; }
+        .team { font-size:22px; color:#FFC107; }
+    </style>
+</head>
+
+<body class="w3-text-white">
+<div class="w3-container w3-center">
+
+    <h1 class="w3-xxxlarge w3-padding-16">🎛 ADMIN CONTROL</h1>
+
+    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge card w3-margin-auto">
+
+        <!-- Search Player -->
+      <input class="w3-input w3-round-large w3-margin-bottom"
+       type="text"
+       id="searchInput"
+       placeholder="🔍 Search Player..."
+       onkeyup="filterPlayers()">
+
+<select class="w3-select w3-round-large w3-margin-bottom"
+        id="playerSelect"
+        onchange="setPlayer()">
+    <option value="" disabled selected>Select Player</option>
+    {% for player in players %}
+        <option value="{{ player.id }}">
+            {{ player.name }} - ₹{{ player.base_price }}
+        </option>
+    {% endfor %}
+</select>
+
+        <hr>
+
+        <!-- Current Player -->
+        <h2 id="playerName">
+            {% if auction.player %} {{ auction.player.name }}
+            {% else %} No Player Selected {% endif %}
+        </h2>
+
+        <div class="price" id="price">₹ {{ auction.current_price }}</div>
+
+        <div class="team" id="team">
+            Current Team:
+            {% if auction.current_team %}
+                {{ auction.current_team.name }}
+            {% else %}
+                None
+            {% endif %}
+        </div>
+
+        <!-- Select Team -->
+   <div id="teamList" class="team-container">
+    {% for team in teams %}
+        <div class="team-box" onclick="selectTeam('{{ team.id }}', this)">
+            {{ team.name }}
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Hidden field to store selected team -->
+<input type="hidden" id="teamSelect">
+
+        <br>
+
+        <!-- Bid Button -->
+      <button onclick="placeBid(document.getElementById('playerSelect').value)"
+        class="w3-button w3-green w3-xlarge w3-round-large w3-margin-top">
+    + ₹50 BID
+</button>
+
+        <!-- Sold -->
+ <button onclick="markSold({{ auction.id }})" class="w3-button w3-red w3-xlarge w3-round-large w3-margin-top">
+    Mark Sold
+</button>
+
+        <!-- Unsold -->
+                 <button onclick="unsoldPlayer({{ auction.id }})"
+                class="w3-button w3-grey w3-xlarge w3-round-large w3-margin-top">
+            ❌ UNSOLD
+        </button>
+
+        <div class="w3-row w3-margin-top">
+
+    <input 
+        type="number" 
+        id="manualBid" 
+        placeholder="Enter bid amount"
+        class="w3-input w3-border w3-round-large"
+    >
+
+    <button onclick="manualBid()" class="w3-button w3-green w3-round-large w3-margin-top">
+        Place Manual Bid
+    </button>
+
+</div>
+
+    </div>
+</div>
+
+<script>
+   
+function markSold(playerId){
+    fetch("/mark-sold/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            player_id: playerId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+        } else {
+            alert("Sold to " + data.team + " for ₹" + data.price);
+            location.reload();
+        }
+    });
+}
+function unsoldPlayer(){
+    fetch("/unsold-player/")
+    .then(res => res.json())
+    .then(data => {
+        if(data.error){
+            alert(data.error);
+        } else {
+            alert("Player marked as unsold");
+            location.reload();
+        }
+    });
+}
+
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 function setPlayer(){
     let id = document.getElementById("playerSelect").value;
 
@@ -477,9 +641,15 @@ function manualBid(){
         document.getElementById("manualBid").value = "";
     })
 }
+<<<<<<< HEAD
 
 </script>
 
 </body>
 </html>
+=======
+</script>
+
+</body>
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 </html>

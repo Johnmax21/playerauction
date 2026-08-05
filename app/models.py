@@ -25,6 +25,7 @@ class Player(models.Model):
     base_price = models.IntegerField()
     photo = models.ImageField(upload_to="players/")
 
+<<<<<<< HEAD
     # final result (after sold)
     team = models.ForeignKey("Team", on_delete=models.SET_NULL, null=True, blank=True)
     sold_price = models.IntegerField(null=True, blank=True)
@@ -34,9 +35,37 @@ class Player(models.Model):
     current_bid_price = models.IntegerField(null=True, blank=True)   # replaces auction.current_price
     current_bid_team = models.ForeignKey("Team", on_delete=models.SET_NULL, null=True, blank=True, related_name="bidding_on")  # replaces auction.current_team
 
+=======
+    team = models.ForeignKey("Team", on_delete=models.SET_NULL, null=True, blank=True)
+    sold_price = models.IntegerField(null=True, blank=True)
+
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
     STATUS_CHOICES = (
         ("pending", "Pending"),
         ("sold", "Sold"),
         ("unsold", "Unsold"),
     )
+<<<<<<< HEAD
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+=======
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+
+    def __str__(self):
+        return self.name
+class Auction(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True)
+    current_price = models.IntegerField(default=0)
+    current_team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_sold = models.BooleanField(default=False)
+    def save(self, *args, **kwargs):
+        self.pk = 1   # always single row
+        super().save(*args, **kwargs)
+class BoughtPlayer(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    final_price = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.player.name} - {self.team.name}"
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f

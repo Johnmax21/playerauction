@@ -4,7 +4,10 @@ from . import views
 urlpatterns = [
     path("control/", views.control, name="control"),
     path("", views.display_page, name="display_page"),
+<<<<<<< HEAD
     path("home/",views.home, name="home"),
+=======
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 
     path("bid/<int:auction_id>/", views.place_bid, name="place_bid"),
     path("get-auction/", views.get_auction, name="get_auction"),
@@ -17,7 +20,10 @@ urlpatterns = [
 path("unsold-player/", views.unsold_player, name="unsold_player"),
 path("mark-sold/", views.mark_sold, name="mark_sold"),
 path("manual-bid/", views.manual_bid, name="manual_bid"),
+<<<<<<< HEAD
 path("set-display-mode/", views.set_display_mode, name="set_display_mode"),
 path("set-ticker-visibility/", views.set_ticker_visibility, name="set_ticker_visibility"),
+=======
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 
 ]

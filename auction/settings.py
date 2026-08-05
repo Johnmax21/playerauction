@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+<<<<<<< HEAD
        "daphne", 
     "django.contrib.admin",
     "django.contrib.auth",
@@ -39,12 +40,23 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "channels",
+=======
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
     'app',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+<<<<<<< HEAD
     'whitenoise.middleware.WhiteNoiseMiddleware', 
+=======
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -52,7 +64,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+<<<<<<< HEAD
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+=======
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 
 ROOT_URLCONF = 'auction.urls'
 
@@ -72,6 +87,7 @@ TEMPLATES = [
     },
 ]
 
+<<<<<<< HEAD
 ASGI_APPLICATION = "auction.asgi.application"  # <-- replace "yourproject"
 CHANNEL_LAYERS = {
     "default": {
@@ -81,6 +97,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+=======
+WSGI_APPLICATION = 'auction.wsgi.application'
+
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -138,6 +158,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app/static')
+<<<<<<< HEAD
     
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+=======
+]
+>>>>>>> 7cf366cb84cba0c0713aee311783559d641c922f
