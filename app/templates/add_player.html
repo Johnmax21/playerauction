@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Player</title>
+
+    <!-- W3 CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #1c1c1c, #2c3e50);
+        }
+
+        .form-card {
+            margin-top: 60px;
+            border-radius: 20px;
+            width: 50%;
+        }
+
+        .title {
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body class="w3-text-white">
+
+<div class="w3-container w3-center">
+
+    <h1 class="w3-xxxlarge w3-padding-16 title">
+        🏏 PLAYER ENTRY FORM
+    </h1>
+
+    <div class="w3-card-4 w3-dark-grey w3-padding-32 w3-round-xlarge form-card w3-animate-zoom w3-center w3-margin-auto">
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <p>
+                <label class="w3-large">Player Name</label>
+                <input class="w3-input w3-round-large w3-margin-top"
+                       type="text"
+                       name="name"
+                       required>
+            </p>
+
+            <p>
+                <label class="w3-large">Playing Position</label>
+                <select class="w3-select w3-round-large w3-margin-top"
+                        name="position"
+                        required>
+                    <option value="" disabled selected>Select Position</option>
+                    <option value="Batsman">Batsman</option>
+                    <option value="Bowler">Bowler</option>
+                    <option value="All Rounder">All Rounder</option>
+                    <option value="Wicket Keeper">Wicket Keeper</option>
+                </select>
+            </p>
+
+            <p>
+                <label class="w3-large">Base Price (₹)</label>
+                <input class="w3-input w3-round-large w3-margin-top"
+                       type="number"
+                       name="base_price"
+                       required>
+            </p>
+
+            <p>
+                <label class="w3-large">Player Photo</label>
+                <input class="w3-input w3-round-large w3-margin-top"
+                       type="file"
+                       name="photo"
+                       accept="image/*"
+                       required>
+            </p>
+
+            <button class="w3-button w3-green w3-xlarge w3-round-large w3-margin-top">
+                ➕ ADD PLAYER
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

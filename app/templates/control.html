@@ -1,0 +1,485 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Admin Control</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+
+</head>
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Control</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700&display=swap');
+
+  :root {
+    --pitch: #0c1410;
+    --pitch-line: #1c2a22;
+    --panel: #12201a;
+    --gold: #d4af37;
+    --gold-bright: #f2cf5b;
+    --unsold: #7a3030;
+    --sold: #2f7a4f;
+    --ink: #f4f1e8;
+    --ink-dim: #a9b3ac;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--pitch);
+    background-image:
+      linear-gradient(var(--pitch-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--pitch-line) 1px, transparent 1px);
+    background-size: 40px 40px;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+  }
+
+  .admin-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-bottom: 1.8rem;
+    color: var(--gold-bright);
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 560px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--pitch) 100%);
+    border: 1px solid var(--pitch-line);
+    border-radius: 6px;
+    padding: 2rem;
+  }
+
+  .field {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--pitch-line);
+    color: var(--ink);
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .field::placeholder { color: var(--ink-dim); }
+  .field:focus { outline: none; border-color: var(--gold); }
+
+  select.field option { background: var(--panel); }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--pitch-line);
+    margin: 1.5rem 0;
+  }
+
+  .current-player {
+    text-align: center;
+  }
+
+  #playerName {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.02em;
+  }
+
+  .price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    color: var(--gold-bright);
+    text-align: center;
+    margin-top: 0.4rem;
+  }
+
+  .team {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--ink-dim);
+    margin-top: 0.3rem;
+    letter-spacing: 0.04em;
+  }
+
+  .team-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+  }
+
+  .team-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--pitch-line);
+    border-radius: 4px;
+    padding: 0.65rem 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .team-box:hover { border-color: var(--gold); }
+
+  .team-box.selected {
+    border-color: var(--gold);
+    background: rgba(212,175,55,0.1);
+    color: var(--gold-bright);
+  }
+
+  .btn-row { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.6rem; }
+
+  .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    color: var(--ink);
+    transition: filter 0.15s ease;
+  }
+
+  .btn:hover { filter: brightness(1.12); }
+
+  .btn-bid { background: var(--sold); }
+  .btn-sold { background: var(--unsold); }
+  .btn-unsold { background: #3a3a3a; }
+
+  .manual-bid-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.6rem;
+  }
+
+  .manual-bid-row .field { margin-bottom: 0; flex: 1; }
+
+  .btn-manual {
+    background: var(--sold);
+    padding: 0 1.2rem;
+    border: none;
+    border-radius: 4px;
+    color: var(--ink);
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-manual:hover { filter: brightness(1.12); }
+</style>
+</head>
+<body>
+
+<div style="width:100%; max-width:560px;">
+  <h1 class="admin-heading">Admin control</h1>
+
+  <div class="panel">
+
+    <input class="field"
+      type="text"
+      id="searchInput"
+      placeholder="Search player..."
+      onkeyup="filterPlayers()">
+
+    <select class="field" id="playerSelect" onchange="setPlayer()">
+      <option value="" disabled selected>Select player</option>
+      {% for player in players %}
+        <option value="{{ player.id }}">{{ player.name }} - ₹{{ player.base_price }}</option>
+      {% endfor %}
+    </select>
+
+    <hr>
+
+    <div class="current-player">
+      <h2 id="playerName">
+        {% if auction.player %}{{ auction.player.name }}{% else %}No player selected{% endif %}
+      </h2>
+      <div class="price" id="price">₹ {{ auction.current_price }}</div>
+      <div class="team" id="team">
+        Current team:
+        {% if auction.current_team %}{{ auction.current_team.name }}{% else %}None{% endif %}
+      </div>
+    </div>
+
+    <div id="teamList" class="team-container">
+      {% for team in teams %}
+        <div class="team-box" onclick="selectTeam('{{ team.id }}', this)">{{ team.name }}</div>
+      {% endfor %}
+    </div>
+
+    <input type="hidden" id="teamSelect">
+
+    <div class="btn-row">
+      <button onclick="placeBid(document.getElementById('playerSelect').value)" class="btn btn-bid">
+        + ₹50 bid
+      </button>
+     <button onclick="markSold()" class="btn btn-sold">
+  Mark sold
+</button>
+<button onclick="unsoldPlayer()" class="btn btn-unsold">
+  Unsold
+</button>
+    </div>
+
+    <div class="manual-bid-row">
+      <input type="number" id="manualBid" placeholder="Enter bid amount" class="field">
+      <button onclick="manualBid()" class="btn-manual">Place bid</button>
+    </div>
+<button onclick="setDisplayMode('squad')" class="btn btn-manual">Show Squad</button>
+<button onclick="setDisplayMode('auction')" class="btn btn-manual">Back to Auction</button>
+<button onclick="toggleTicker('team', true)" class="btn btn-manual">Show Team Ticker</button>
+<button onclick="toggleTicker('team', false)" class="btn btn-manual">Hide Team Ticker</button>
+<button onclick="toggleTicker('sold', true)" class="btn btn-manual">Show Sold Ticker</button>
+<button onclick="toggleTicker('sold', false)" class="btn btn-manual">Hide Sold Ticker</button>
+  </div>
+</div>
+
+
+<script>
+   const auctionSocket = new WebSocket(
+  (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+  window.location.host + '/ws/auction/'
+);
+
+auctionSocket.onopen = function () {
+  console.log('Auction socket connected');
+};
+
+auctionSocket.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+
+  document.getElementById("playerName").innerText = data.player || "No player selected";
+
+  if (data.auction) {
+    document.getElementById("price").innerText = "₹ " + data.auction.current_bid;
+    document.getElementById("team").innerText = "Current team: " + (data.auction.sold_team || "None");
+
+    const statusEl = document.getElementById("auctionStatusCard");
+    if (statusEl) {
+      statusEl.innerText = data.auction.status;
+      statusEl.classList.toggle("is-sold", data.auction.status === "SOLD");
+    }
+  }
+};
+
+auctionSocket.onclose = function () {
+  console.log('Auction socket closed — retrying in 2s');
+  setTimeout(() => location.reload(), 2000);
+};
+
+auctionSocket.onerror = function (err) {
+  console.error('Auction socket error', err);
+};
+function markSold(){
+    fetch("/mark-sold/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) alert(data.error);
+        else alert("Sold to " + data.team + " for ₹" + data.price);
+    });
+}
+function setDisplayMode(mode){
+    fetch("/set-display-mode/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({ mode: mode })
+    });
+}
+function toggleTicker(ticker, visible){
+    fetch("/set-ticker-visibility/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({ ticker: ticker, visible: visible })
+    });
+}
+function unsoldPlayer(){
+    fetch("/unsold-player/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) alert(data.error);
+    });
+}
+function setPlayer(){
+    let id = document.getElementById("playerSelect").value;
+
+    if(!id) return;   // Prevent empty selection
+
+    fetch("/set-player/",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:JSON.stringify({player_id:id})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        console.log(data); // Debug
+
+        document.getElementById("playerName").innerText = data.player;
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText =
+            "Current Team: " + (data.team || "None");
+    })
+    .catch(error=>{
+        console.error("Error:", error);
+    });
+}
+function filterPlayers() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let select = document.getElementById("playerSelect");
+    let options = select.getElementsByTagName("option");
+
+    for (let i = 0; i < options.length; i++) {
+        let txt = options[i].textContent || options[i].innerText;
+
+        if (txt.toLowerCase().indexOf(input) > -1) {
+            options[i].style.display = "";
+        } else {
+            options[i].style.display = "none";
+        }
+    }
+}
+function placeBid(playerId) {
+    console.log("placeBid called with playerId:", playerId);  // e.g., 3 – already working
+
+    // ✅ Global team select (matches your HTML)
+    let teamSelect = document.getElementById("teamSelect");
+    let teamId = teamSelect ? teamSelect.value : null;
+
+    console.log("Found teamSelect element:", teamSelect);  // Should log the <select> element
+    console.log("Team ID from select:", teamId);  // Should log the selected value (e.g., 2) if chosen
+
+    if (!playerId) {
+        alert("Please select a player first!");
+        return;
+    }
+
+    if (!teamId) {
+        alert("Please select a team first!");
+        return;
+    }
+
+    console.log("Sending to backend: player_id=", playerId, ", team_id=", teamId);
+
+    fetch("/place-bid/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            player_id: playerId,
+            team_id: teamId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Backend response:", data);  // e.g., {price: 80, team: "Team2"}
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        // Update global UI (matches your HTML IDs)
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText = "Current Team: " + data.team;
+
+        // Optional: Reset team select after bid (forces re-selection)
+        teamSelect.value = "";
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Bid failed – check console.");
+    });
+}
+function selectTeam(teamId, element){
+
+    // store selected value
+    document.getElementById("teamSelect").value = teamId;
+
+    // remove previous highlight
+    document.querySelectorAll(".team-box").forEach(box=>{
+        box.classList.remove("active");
+    });
+
+    // highlight selected box
+    element.classList.add("active");
+
+    console.log("Selected team:", teamId);
+}
+function manualBid(){
+
+    let playerId = document.getElementById("playerSelect").value;
+    let teamId = document.getElementById("teamSelect").value;
+    let bidPrice = document.getElementById("manualBid").value;
+
+    if(!playerId){
+        alert("Select player first!");
+        return;
+    }
+
+    if(!teamId){
+        alert("Select team!");
+        return;
+    }
+
+    if(!bidPrice){
+        alert("Enter bid amount!");
+        return;
+    }
+
+    fetch("/manual-bid/",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:JSON.stringify({
+            player_id:playerId,
+            team_id:teamId,
+            price:bidPrice
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById("price").innerText = "₹ " + data.price;
+        document.getElementById("team").innerText = "Current Team: " + data.team;
+
+        document.getElementById("manualBid").value = "";
+    })
+}
+
+</script>
+
+</body>
+</html>
+</html>
